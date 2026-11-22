@@ -351,6 +351,27 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 0 26px;}
 .outils button{width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:13.5px;display:flex;align-items:center;justify-content:center;color:var(--text-2);box-shadow:0 1px 3px rgba(16,24,40,.08);}
 .outils button:hover{border-color:var(--accent);color:var(--accent);}
 #zoneImpr{display:none;}
+.barre-tbl{display:flex;justify-content:flex-end;gap:6px;margin:0 0 8px;}
+.barre-tbl .ico,.btn .ico{width:15px;height:15px;}
+#menuVues{position:relative;display:inline-flex;}
+#menuVues .sel-menu{right:0;left:auto;top:calc(100% + 8px);}
+#menuVues.ouvert .sel-menu{display:block;animation:menuIn .14s ease-out;}
+#menuVues .ic-btn{color:var(--s4);}
+.boite.guide{width:min(820px,100%);max-height:88vh;overflow:auto;}
+.guide-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:8px;}
+.guide-g > div{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:10px 12px;}
+.guide-g p{margin:4px 0 0;font-size:13px;color:var(--text-2);}
+.guide-g code{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:0 5px;font-size:12px;}
+/* Mode écran atelier */
+.tv-bandeau{display:none;}
+body.tv .rail,body.tv .topbar,body.tv .chips,body.tv .astuce,body.tv .titre-page,body.tv footer,body.tv .outils,body.tv .retour-flot,body.tv .barre-tbl,body.tv #btnRapport{display:none !important;}
+body.tv .app{grid-template-columns:1fr;background:none;}
+body.tv main{max-width:none;padding:70px 26px 20px;zoom:1.12;}
+body.tv .tv-bandeau{display:flex;position:fixed;top:0;left:0;right:0;z-index:80;align-items:center;gap:14px;padding:10px 22px;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--shadow);}
+body.tv .tv-bandeau b{font-size:19px;}
+.tv-pt{width:10px;height:10px;border-radius:50%;background:var(--err);animation:pulse 1.4s infinite;}
+.tv-h{margin-left:auto;font-weight:800;font-size:22px;font-variant-numeric:tabular-nums;}
+#tvBarre{position:absolute;left:0;bottom:-1px;height:3px;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));}
 .filigrane,.pied-impr{display:none;}
 .cp{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;margin-left:6px;vertical-align:middle;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;opacity:.45;transition:all .15s;padding:0;}
 tr:hover .cp,.cp:focus-visible,.cp.gros{opacity:1;}
@@ -429,6 +450,7 @@ tr:hover .cp,.cp:focus-visible,.cp.gros{opacity:1;}
       <div class="rail-t">Analyses</div>
       <button class="tab" data-v="flux" onclick="aller('flux')" style="--tc:var(--s3)"><span class="ic">🔄</span><span class="lb">Flux &amp; organisation</span></button>
       <button class="tab" data-v="qual" onclick="aller('qual')" style="--tc:var(--s5)"><span class="ic">🔬</span><span class="lb">Qualité &amp; pannes</span></button>
+      <button class="tab" data-v="pieces" onclick="aller('pieces')" style="--tc:var(--s4)"><span class="ic">🔩</span><span class="lb">Pièces (hit-parade)</span></button>
       <button class="tab" data-v="mag" onclick="aller('mag')" style="--tc:var(--s2)"><span class="ic">🏬</span><span class="lb">Magasins</span></button>
       <button class="tab" data-v="atl" onclick="aller('atl')" style="--tc:var(--s4)"><span class="ic">🏭</span><span class="lb">Ateliers</span></button>
       <button class="tab" data-v="enc" onclick="aller('enc')" style="--tc:var(--s4)"><span class="ic">⏳</span><span class="lb">Encours &amp; délais</span></button>
@@ -440,7 +462,7 @@ tr:hover .cp,.cp:focus-visible,.cp.gros{opacity:1;}
       <div><span class="voyant off" id="voyant"></span><b id="etatT">Aucune donnée</b></div>
       <div class="det" id="etatD" style="margin-top:4px;color:var(--rail-mut)">Ajoutez vos exports ou configurez le dossier OneDrive</div>
     </div>
-    <div class="rail-pied">PilotPerf V1.2.7 · Référent Bezons<br>© 2026 Malek Tahri</div>
+    <div class="rail-pied">PilotPerf V1.3 · Référent Bezons<br>© 2026 Malek Tahri</div>
   </aside>
 
   <!-- ═══ CONTENU ═══ -->
@@ -470,8 +492,11 @@ tr:hover .cp,.cp:focus-visible,.cp.gros{opacity:1;}
           <input type="date" id="fDu" title="Du" style="display:none" onchange="majFiltre()">
           <input type="date" id="fAu" title="Au" style="display:none" onchange="majFiltre()">
           <button class="ic-btn" id="btnActu" onclick="relireTout()" title="Actualiser depuis le dossier OneDrive" aria-label="Actualiser"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6l2.5 2.4"/><path d="M20.5 3.5v4.9h-4.9"/></svg></button>
+          <div class="menu-v" id="menuVues"><button class="ic-btn" onclick="basculerVues(event)" title="Vues enregistrées" aria-label="Vues enregistrées"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button><div class="sel-menu" style="min-width:300px"></div></div>
+          <button class="ic-btn" onclick="modeTV()" title="Mode écran atelier (plein écran, défilement automatique)" aria-label="Mode écran atelier"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12" rx="2.5"/><path d="M8.5 20h7M12 16.5V20"/></svg></button>
           <button class="ic-btn" onclick="imprimerVue()" title="Imprimer ou enregistrer en PDF l'écran affiché" aria-label="Imprimer"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3.5h10V8"/><rect x="3" y="8" width="18" height="9" rx="2.5"/><path d="M7 14h10v6.5H7z"/><circle cx="17.5" cy="11.3" r=".6" fill="currentColor"/></svg></button>
           <button class="ic-btn" id="btnTheme" onclick="basculerTheme()" title="Passer en mode sombre" aria-label="Mode clair ou sombre"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 13.4A8.5 8.5 0 1 1 10.6 3.5a6.6 6.6 0 0 0 9.9 9.9z"/></svg></button>
+          <button class="ic-btn" onclick="ouvrirGuide()" title="Guide d'utilisation" aria-label="Guide"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.7"/><circle cx="12" cy="17" r=".7" fill="currentColor"/></svg></button>
           <button class="ic-btn" id="btnAdmin" onclick="basculerAdmin()" title="Administration des sources (mot de passe)" aria-label="Administration"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg></button>
         </div>
       </div>
@@ -501,6 +526,7 @@ tr:hover .cp,.cp:focus-visible,.cp.gros{opacity:1;}
       <section class="vue" id="v-inter"></section>
       <section class="vue" id="v-flux"></section>
       <section class="vue" id="v-qual"></section>
+      <section class="vue" id="v-pieces"></section>
       <section class="vue" id="v-mag"></section>
       <section class="vue" id="v-atl"></section>
       <section class="vue" id="v-enc"></section>
@@ -517,6 +543,26 @@ tr:hover .cp,.cp:focus-visible,.cp.gros{opacity:1;}
 <div class="filigrane" aria-hidden="true"><span>CONFIDENTIEL</span></div>
 <div class="pied-impr" aria-hidden="true"><img id="logoFD" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaQAAABaCAYAAAD3oyLoAAA6H0lEQVR42u19d1hU1/b2u6fSkSISAStW7IiCJXZjjBpLYsu1JfbKvTFVY0n8GUv05sZ8UaMmRo0aNWg0qKiAoiKiQCyIsQRQQYr0Nkzb3x/JPs/AnDO0GUA97/OcR4SZc87ee+211l6VUEohQoQIESJE1DUk4hSIECFChAhRIIkQIUKECBH/QCZOwfMJU6ZWQki9e09KaZmfDd+TEFLmZxH1m8bENRJhKRA+oqOUQq/Xoz75lwghkEqlAACdTsf7boafsfRGrWh+pFKpRTZuRc8mhEAikdQp0yj/jjKZrErfqQ9jEIJer4derzcbTddHYUwphU6nM/kZS9C30L6uyzk253rXJe+srf1UGdoxxafJixbUwBiaiLph1uVPPACg1WqRkZFBMzMzUVJSApVKBa1WC1tbW9jZ2cHV1RVubm7EkEgNT1QSieSlmDdDvOhjrgu+wK7yQkoE6qfJji1WVlYWoqKiaF5eHmQyWZ2elCQSCUpLS9GyZUv4+voShUKByMhI+ujRozJaj06ng7e3N3x9fYmlTQtFRUWIjo6maWlpZRgHIQRarRYODg7w9/eHq6srMZeAZPfJy8vDgQMHaGxsLKytrcusjV6vh6urKxYuXGjWZ1d2s7O5UKvVuHPnDr18+TKuXbuG3NxcZGVlITs7GyqVCqWlpdBqtbCxsYGNjQ2cnZ3h4uJC7e3t0bNnT/Tr1w9t2rQhcrmcG1ddMxC9Xg+JRII7d+7Q2NhYKBSKau8LmUwGpVIJZ2dnNGnSBB4eHqT82ISEe22M8enTp/Tbb7/F06dP4eDgUEZglpSUICAgAGPHjiUNGjQw27NVKhWio6Npamqq2faLlZUVHB0d0bp1a7i6uhKFQlFmv1ZEV5RSxMfH09u3b9dL4cVOGuxEUp4eGT965ZVX4O/vT6ysrCzGF9mznz17Rq9cuYLCwkIj2UEIgVqthouLC/r06UPs7e2NDhCy8gQplUrx+PFjumrVKvz555+Qy+UVHsEsKjFlMpSWlmLkyJHYsmULnJycsGfPHhw8eLCM0NJqtWjTpg02bNhABwwYQAy1IXNv2IyMDLpixQrcvHkTUqmU27DsPTw9PbF9+3b07dsXOp2uUiaryhAfAMTExNCvvvoKDx8+FPxs69atMXny5FplYoQQJCcn0ytXruDUqVOIiopCYmIiNBpNle538OBBeHt7o3fv3nTYsGHw9/eHh4cHqcvTr+Fpbffu3di6dSuUSiW0Wm21lSy5XA5bW1s4OTmhUaNGtF27dujQoQPatGmDJk2aoHHjxkQikcASdFwRUwkPD8fatWsFP/fbb7+hbdu2tFevXoStf00VrWfPntGtW7fi5MmTZhurTCaDtbU13Nzc4OzsTH19fdG5c2e0b98erVq1IjY2NiatKjqdDj///DO2bt0KiURSr0x3jDbat28POzs7xMTEQKvVghBSxker0+ng6emJr776ig4fPpwYKjrmphu9Xo8jR47g888/R1FREaRSqZFAopRizpw5GDBgAK9CJxN6QF5eHgoKCurNAqjV6jLaQF5entFnrl+/js8//xyNGjWi7du3t5g5UqPRoLS0FPn5+bx/z87OhlqtNvtzCwsLcfr0aTx+/FiQIep0OoSHh2P06NGwsbGxKDNjp6LHjx/TCxcuYMeOHbh9+zays7O5z8jlct6AhvKClmmqGo0GCQkJSEhIwLFjx+Dr64slS5bQnj17Eicnpzo3yebn56OwsBCFhYVmuV9iYiIA4NSpU2jQoAHs7Ozg7e2Nt99+m/bq1Qtt2rQh7CRsyXEzZbS4uBhnzpwBIQRWVlZGdPyP8EBISAi6d+/OrW913419TyqVQqVSCe6pmuDJkycAgLCwMDg4OMDZ2RkjRoygb731Fnx8fIizszPvGAgh0Ov1vLymPpyOKKXw9PTEmDFjcP/+fY6WyiMhIQE7d+5E9+7dqZubG2EnQ3PzgTt37tDvv/8eaWlpgp9t1aoVZsyYASsrK/AqM4a2Va1WC0opYmNjabt27SghhMpkMkoIqbNLLpdTQgh95513aH5+PtRqNRYuXGj0OYlEwr3rhAkTaG5uLudgMxxjTS52rz///JP269fP6B2kUiklhFBPT08aGhpKKaXQaDRme/4ff/xBu3fvTgFQqVRKARhdhBDq7e1NL126RM09fnax4ANKKcLDw+lbb71FnZ2dy7yDRCKhhBDedzR1se8a/s7Ly4suWLCAJiQkUHOPpbLjZXtj0aJFZeiyupdEIqESiYRKpVLetbSxsaFdunShH3zwAb1+/TqtjTFSShEWFkabNm1KARitA1sfQght2bIlvX//vtloLCMjg7799ttm5R2m5lgikdCmTZvSJUuW0Bs3blCh/b5ixYp6wQfLXwqFghJC6KRJk6hKpcLSpUvL7LvyPMnJyYnu2LGDsrUy3MM1pRt2r1mzZnFzZfgebB1kMhn9v//7P0ophVqt5r2foEBq27atScZXW5dMJqMA6KRJk2heXh7UajUWLFhgkpkRQujChQtpUVGRWSffUCD17dvX6PlsA3t4eFhEIH3zzTdUIpFQuVxucs6kUin97LPPaEFBgVnHb3ivwsJCrFy5knp6ehqtgbnW3vBehBDarVs3euzYMVqXAmnhwoVl6NKcY+UT5BKJhHp7e9NPPvmEPnr0iFpSGJWUlGDp0qXcc/nWkv1OLpfTb775xmw0np6eTt966y2L8hLDOTacXx8fH/rTTz9RNg42HzqdDsuXL68XfLD8xXjA+PHjaVFRER4+fEgbNmzIuwfZu/v7+3NKnbkUVTZnv//+O3V0dORVZNj7DB48mBYUFECv1ws+X2KOcMrauqoSSfPjjz+CaQTPczQNM3ElJyfTrVu3couJCsJnf/vtNzx69IhWlLNUnXVPSUmhEyZMoKtXr+bMIWyO+UxyFa2f0GcM7/WPooSxY8di27ZttL5Gh1aXrssLB/Z7vV6PBw8e4Msvv0RAQAAuXLhAhcyfNfVP3r9/n165cqWMSUjIPKPRaPDtt9/iwYMH1NCPWt/m1pCmDOfY0CQXHx+P9957Dxs3bqTMD2NOPmdJXiqVSqFWq9GiRQuyatUq3iA0nU4HuVyOqKgofP3119BqtZwPqqZmXplMhpSUFLpx40awIDhDWmB01KhRIyxfvhx2dnZlAqDMVqmhtrRTJoHZEa+y9syioiJs2rQJBw4coM9zaDsj6NOnTyMhIQEVbX72+Xv37uH8+fNmF4wJCQl06tSpCA4ONtrsfLkPZY7jBg59uVxuxIzZ2pnaxHq9HvPmzcO2bdtoXQbbmHNfsLmqKCk1JSUFb775Jnbs2EHVarWg0KgOtFotzpw5g7i4OI5RVxSI8PDhQwQFBXHO8/o4t0Lzy6fwfPrpp/jmm2+o4dgZ/2En5OpclhgX44cajYYb27Rp08igQYME15cQgp07d+Ls2bM1VlTZXqWU4ueff8bFixcF6UChUGDhwoXo2bMnqSigQlbdCA97e3uzRI9VBLlcjtLSUshkMuh0ukpF9DBn2ePHj/G///0Pnp6etH///uR5zVEqLi7G4cOHK8WA2BhVKhX27NmDcePGUTc3txqPnRCCx48f088//xxhYWGC78I2PzuSKxQKODo6wtHREa1atULTpk3h5uYGAMjIyMDdu3eRmJiIoqIi5ObmcoEapqKaCCFYv349XFxc6NixY0lt0GFl58jW1hZWVlbcOgitl16vh1qthkql4uaKzZ1Q4rNEIkFeXh6WLl2K/Px8On/+fGKuwJW//vqLnjt3DsXFxWWCh4RoTCaTQavVIiQkBIGBgZyiZKn8KcO5rSwz1Wg0UKlUHPNmpwo+umJ/37JlCzp06ECHDh1K2Dq4uLhUOCdCfLK4uBhFRUWCn1EqlTAMf66skJDL5VCr1WjQoAG39ra2tvjkk08QFxeHjIwMwTXbtm0bevbsCaFgjqrgjz/+oIcOHeJOS+UDrSil6NmzJ8aPHy8cyFBTgeTu7o4PPvgA7du3h0qlsmgSH1tUd3d32NjYoPyR2pRQIoTg+vXrWLFiBb7//nvatm3b51IonT9/noaGhvIyaVObLCEhAefPn8eECROg0+lqVMWisLAQX375JQ4ePGhSGDETgY2NDTp27IhRo0bBz88PTZs2hbW1Nezs7IhSqeRMJ/n5+bSgoABJSUmIiorC4cOHcefOHS7qi48JUEqRnJyMjRs3okWLFpTlntX1uspkMkycOBEjR46s0FyjUqmQlpaGp0+f4saNG7h58yYeP37MjZcx+PJ5ZhKJBIWFhVizZg0kEgkNDAwkjC5qsg/j4uIQFRXFq+UannTL50n9+eefCA8Pp6+99hqxhNmO0ZpSqcTixYvx6quvViqVQK/XIysrC6mpqbh+/TpiY2Px6NGjMgyYb26TkpLw3XffoVOnTtTd3Z1MnDgR/v7+XDRhVcxZtra2OHjwIHbt2iW4XwYPHozp06dzgrYq86JWq+Hp6QmlUsn9vkePHmTmzJl0w4YNRpUvGO88ffo0goKC6MyZM0lNrCWFhYXYs2cPbt26xeU8lX9HGxsbTJo0Cc2bNyemTHUVRtmZCmpo3bo1vXbtmsWiuExdxcXFnGO5MhdzsL3xxhs0Ly+vRk7+2g5q0Ov1KC0txfTp03kjnipy3gKgo0ePpvn5+dDpdNVaK/adlStXUoVCIfgehnTi6+tLt27dSjMyMqrshP/rr7/oypUracuWLY3GwjfXkyZNohkZGdSUo7S2ghoUCgVdu3Ytrex7sHuq1WpcvHiRBgYG0l69enH3FgoskEqlVCKRUFdXV7p3716q0+mg1WqrTddZWVkYPnx4lZz3hgECs2fPpvn5+TWKahUKamDjt7Ozo8HBwbQ6tKvT6XD58mW6aNEi2qZNmwrHZW9vT7dt20ZrYqZjz968eTNHq3zBBosXL6bZ2dlmpdf4+Hjav39/3gADtr4BAQH07t27NQqSOXHiBPX09OSi6Pjmc+zYsdz4KkOf1RJI3t7e9OLFi1Sr1UKj0XDMztJXdQSS4RhmzZpVYZRHfRFIbPFiYmKot7e34OZxcXGhXl5eRpF3jFnY2trSXbt2mQy1rGi8p06dojY2NoIRdGx+7ezs6JIlS2hiYiI1vIfhxcJE2cW3xpRSXLlyhb722muCQskwWmrLli0WVY4qK5DkcjldvXo1LS4uBhMSpuiZjd9wo6anp9OtW7fSLl26mIxcZGHIbm5uNCwsjJYPwa3K2EJDQ7lQXT56btasGRfBxfd3Hx8fLjTdkgLp2LFjVKvVVjiv5efX8J1iYmLoyJEjqVKpNJma8MYbb9AHDx7Q6vIqtVoNrVaLjRs3mhRI8+fPp9nZ2ZWiF6Ex8s3nnj17qLOzM+8YCSFUqVTSwMBAWlhYWC1FJi0tjY4YMUJwL0gkEurs7EwjIiKqJPQkNSnWJ5VKIZFIau1CDYo2SqVS7NixA7t27aLlM5rra2SdSqVCUFAQkpOTeeucWVtbY86cOViyZAkUCoVRtBsL7jh16hTn/KzsmJn55dmzZ/SLL75AcXGxoElVp9OhYcOGWLt2LdavX0+aNWtG2GZhtMKu8lFC5f/GNqa/vz/Zvn07xo4dyxvoYOiw3rZtG5KSkmhFzvjaCkBhvs7K0LPhd7RaLdzc3MjcuXPJgQMHMGfOHNja2vLa+bVaLeRyOTIyMrBp0yY8e/aMVsdkSSnFDz/8IFh1Qi6XY/HixZg6daqRz5jRUmJiIkJCQqBWq80SvWXKfF8VnmNo0mbz261bN/Ltt99i3LhxEEoQJYQgMjIS9+/f52ivOvyqMgVo+fZBVS6+++v1eowcOZKwMfLxztLSUuzfvx8XL16sMt2o1Wrs3r0boaGhvGZ1Zm5euHAh+vbtW6UCBZKXqfCnRCLBxo0bcfz4ccrs0PU5fPju3bs0NDRU0Gbu5uaGMWPGYOTIkWjTpg1v5BAhBLdv38bt27crHZ5rGPF2+PBhXL9+nZfwme/CxcUFK1euxIIFC4hSqeQUgKpWGGZhrFKpFBqNBk2bNiVffvkl/Pz8eDcWG9/du3fx1Vdfcb60ul7Tyo65fPguC5nVaDRo27YtWbt2Lfn444/RqFEj3jGp1WrIZDKEhobi4MGDVXZQM2vIkSNHjPyQjFa6du2KN954A1OmTOEVSKy6w6lTp3D//n1aX0PwGV1ptVo0adKELF68GJ6enrwhyJRS5OTk4MmTJ3geI3QJIWjQoAGmTZuGhg0bGtEko5OMjAxs374daWlplY5EppTi1q1b9KuvvkJJSYnRfmMKaqdOnfDuu++iqlUhJC9btd+UlBSsWrUKMTExlJ2S6hPRMWJRq9WIiYnB7du3wVf6HwA6duyIVq1akSZNmpAhQ4YYbSzGYB48eICjR49W+pTENmlmZiY9fvw4Vz6mPOFRSuHg4ID//Oc/mDlzJudcr2kLEEIIF1XZunVr8vHHH+OVV17hFUpM+7148SKys7ON6mc9b2Bh8TqdDs7Ozli6dClZtGgRF03Fd1JUqVQICQlBSkoKreo8Hzx4EKWlpUY1x1jU1MCBA+Hh4UE6dOhAOnfuLJgrdvPmTURHR5vMYaovbRj0ej18fX3JiBEjuOgzvs9evnwZhYWF9dqaYioQpGfPnmTWrFm89TQZnzl58iR+//33Kin227dvx7Nnz4x4CXuum5sbli5dCi8vL1JVy5bkZStBL5FIcPv2bSxduhQPHz6k9a1oIlvg1NRUeujQIaOaaayAq5WVFSZMmABHR0dYWVnh1Vdf5cKpy49Xq9UiLCwMT58+pZXJMWHEFR4ejri4OF6CZ5rRgAED8K9//QvsZGSuiEvDPKYhQ4aQyZMng0XnGTJFNpakpCT8/vvvdW62MxeYYLWyssLcuXPJqFGjeE9ALPE7IiICZ86cqRKNPXnyhIaHhxvdk827l5cX+vTpAxsbG0ilUsyePduIMTMFJD8/H5cuXTIZ4lxfBD7wd0Tk8OHDYW1tXSaXp1ylbxQXFz+32o1MJsPs2bPRo0cPaDQaXqGkVquxdu1a3Lt3r1K5ScePH6d79uzhjexlNPv6669j1KhRpDq8QPIy9uyRSqWIjIzEvHnzkJqaWmuZ5lXB1atXERkZaXTcZszCz88PLAlOr9fD39+f9OzZU5D53Lt3DxcvXixDOKaEdm5uLsLCwozyGQzfp2HDhpg6dSqaNGlCzHEyEtL0bGxsMG3aNHh5eRkxZfb//Px8hISEID8/3yhbHM9xUjTLg/noo4/QtWtXwVNifn4+Tp8+jfT0dFpZgXTs2DHcuHHDiBbY/3v37g1/f3/C3mPChAmCNCaVSrFv3z4EBwfT+t5Vlo3Pw8MD7u7ugqbOgoIClJSUPNe007RpU7J48WI4ODhwFRrKfy4xMREffPCBYG8uNl9Pnz6l27dvNzpRM56i1WrRuXNnzJw5E46OjtVTGF4kYcMY4jvvvIPBgwfDVJCDTCbD2bNnsWbNmjJZx/XhBFdQUICgoCDudFTeLwQA/fv3h7u7O2EORWdnZ0ycONFIKDDTS2ZmJvbu3YvU1FSTmhD7fWZmJo2OjuaYjeHJiQmfsWPHYtCgQRbNAWL3bdGiBZkwYQKUSiVvLhYAxMbGIjExkdZn32B1x9++fXsyb9483uZ9bKx//PGHYMVnvgrtR48e5c050uv1cHNzw8iRI+Hi4sIxbFtbW0yZMkUw50+tVuP06dMcE6/va6BQKGBtbS3499zc3Beiid/YsWPJO++8Y9K/GRYWhjNnzlBTuX979+7lPYUzs7lSqcTEiRO5igzVWf8XUiB17doVmzZtQtOmTQW7b7JJ//HHH7Fp0yau5l1dbiLGaKOjo2lYWBjv6Uin06Fdu3YYO3askRnitddeI56enhBq9hYfH8+Z4ISO0+y7jx49Qk5OjiBjsbGxQe/eveHo6FjpZOXqMmSdTgdbW1sEBATAzs5OUIjm5OQgNTX1hTQ1A8Cbb76Jzp07Q6vVonx3XUII7t+/j3v37lXqXrGxsYiNjRVc/2bNmqF79+5GWnOfPn3QsmVLI9pkQunkyZO4e/fuc6EN5ObmIjMzU5DGnZ2duejV5/mUZG1tjUmTJsHHx8fohM3GXVRUhC+//BIZGRnUUAFl6xodHU337NkjWEGEnagnTJhQo5YkL6TJrqioCJ06dSJff/21oDOcaf4qlQrbt2/Hr7/+SuvSzMMWWqfTYefOnXj27BlvNrlUKsVrr72GDh06lMl8ppTCyckJY8aM4TXBSKVSPHnyBOfPn4dKpeLdhIaFM6OiopCeni64WV1cXMDMN5bWItn9vb298e6772Lq1Kl49913MWPGDO6aPn06Ro8eDVtbW9R3k1F10bBhQzJp0iSTCkVcXJygmYmtb3Z2Nk6ePMnbe4h9pm/fvvDy8jLKrm/bti0ZN24cr0CSSqVIT0/HwYMHYe6eO+amJ71ej2vXriEzM1PQxOvp6flCtJKnlMLX15dMnz4dDg4ORpGFbJ2io6MRFBTE5dyxNczJycGOHTsQHx8vGGnr6OiIWbNmcRUZYI4W5lUZIEsWNDdDNocfgmkGw4cPJytXrqQffvgh7+Zj4ckPHjzAunXr4OXlRQMCAogla3JV5NuKj4+nV69eNarnxn52dnbG8OHDuSg0Nl+MqN555x1s374dKpWqTFM8RoTBwcEYOXIkffXVV4kQw1Cr1bh9+zZKSkoEy/e0b98erVu3JuYMZKjIEd26dWuyevXqMubD8h0/WdvzF4GRlKdnQgheffVVuLi4ICsri7eU1OXLl5Gbm0utra2J0B67desWDQoK4hiO4d7T6/Vo3rw5Jk2aBLlcDq1WW8YZrlQq0a9fP+zduxdpaWllvs+sDL/++ivmz59PmzZtWu9KdbG9nZmZSU+cOGHysz169ECDBg3I86zgMAuDjY0N3nrrLRw6dAjXrl3jPSUVFxfjxx9/RPfu3Wn37t2JRqOBXC7HuXPn6P79+3kjKFnQ1NChQ2HYkba6+09SXdOYnZ0dZDIZZDKZWZJeWZ6AOfMP5HI5Jk6cSBYuXAi5XM57f+ZPiouLw/Lly5GUlETrwp/EstwPHTqElJQUo4Vnpxw/Pz907dpV8BTQpUsXMnHiRCMtiAm8hIQEnD171qTzsri4mGZlZfE+g93X19e3jBZVW5vLysoK1tbWsLa2hpWVFfd/9nN9KbRqSUd8+/bteXNLgL9ry+Xm5gqmE2i1WgQFBaGgoIB33VjATIcOHQQDVbp164Y+ffoY0ZhhFXDma6gvjJztL8ZA9+7dK1i7jwnerl27cpGdeM5dGXq9Hs2aNSOLFi2Cra2tkdWIRbXeuHEDBw8ehEql4goqf/vttygpKTHiSSyQwcnJCfPnz4eDg0ONaypWa/dmZ2fjl19+wa1bt2hhYaFZBMk/iZDo168fsbe3N5s25OjoiH//+99ISUnBTz/9xKvxMy0wLCwMM2fOxL59+6i7u3utaXfs+ffv36eHDh0yatfOCMHe3h5Tp06Fk5OT4ClOJpPhX//6F44cOWIUgss2ZFBQEKZPn05btmzJO8acnByTLbqVSiWaN28uWNZfhOXMlvb29sTDw0Mwko21WBc6GcTHx9NffvkFpaWlvCdwW1tbjB49GkqlEkxDhnFxZTJs2DB67tw55OXlGTEqQgiOHDmCESNGUHd3d2KuPWRY7qiy9zSsoi6VSlFUVIS9e/fSNWvWcEyXL0imXbt2nK/sRaEfnU6HKVOmkNOnT9P9+/dziruhBaW0tBR79+5Fv3796MiRI8n69esRERHBm3ME/B0YMn/+fPTv398skbbVEkiZmZlYt26dWTUgSim6d++OAwcOUHt7e7MIA0Zsrq6u5IsvvqDx8fG4fv26SaEUGhqK5cuX45tvvjEZgWPuyDpKKSIiIjinvOEmYYTQsWNHdOnSpcKeSD4+Phg+fDh++eWXMkyHEcydO3cQHByMhQsX8tqSS0tLufnhS3yTyWRcBnh9rYLwosLOzg6urq6Cc8FajwjN3c6dO5GTk8Or8FBKMXjwYM70wsdcGD0MHToU3bp1Q1hYGBdsY+gEv3LlCi5evIjx48eb1XTLqi6gGi1ckpKS6O7du/Hjjz8iJydHsMUJpRSDBg1CmzZtyItCc4ZrHBgYiCtXriApKYnXhZGRkYF9+/ZBqVTSkydPCjbf1Ov1GDhwIObOnWtkRq/2Gte0JIe5M9RhAf/DP0l+ZPv27fDz8xNsxcCE0p49e7B7925qWBgVFvaRpKam0uPHj6OgoKCMNsLmmAUzVKaMu6urKxk1ahRYrxw+AfjDDz+gsLDQZBsJUyYABwcHUUDUkfnFVOQXnyLHTkepqan00qVLXOWN8t9r0KABxo0bx60tH42xfe/u7k66d+9uMocnMjLS5Em7qjwnLy8PhYWFePr0KU1JSaGpqallrpSUFJqZmUmfPXtGHz16RO/fv0+joqLoL7/8QpctW0YnTpyIr7/+mqsywCeMJBIJvL29MW7cuCq3hMBzkCir1+vRvXt3MmvWrDK+yfLRkqGhoZg9ezZSUlLKdNk15KnW1taYNWsWPD09K9dawpJBDeZmRMxHYsmomm7dupEvvviC/vvf/+a6r/KdlABg1apV8PDwoCNGjCCW8ikZNuW6du0aYmNjee3yAODl5YXBgwdDoVBUaLKQSqXo2LEjOnfujCtXrpQZJ2NON2/eZBW1SXXem83Ti5Lv87yAVZKuzin86NGjuHfvnmD/LBcXFwQEBFS4piy3bcyYMThw4AAeP35chsEzuj5x4gRGjhxJWa5aTXxnzOF+/vx5WlxczMuDGA9hRYUfP36M9PR0FBcXIysry8g8ybdvdDodxo0bBz8/v+e2oWdlDhPTpk3DuXPnEBYWxpvnmJWVBeZH5jtpyWQyTJ48GYMGDSLm5AGymhKKJRy3ljqF/GOSIB999BH98MMPkZGRwUuc/0ThYMmSJWjQoAHt168fsWTRzpKSEpw8eRJPnz4VjGrr2bMnfH19Kx0B6O3tTfz9/emVK1eMulGyU9/u3bsREBDAacTlbfWmmCJf1KII1Iq/sbS0tNL7iNFLRkYGPXr0qFHkJKMLhUKBCRMmoEmTJhWaqdjf/Pz8yIgRI+h3333HdTA1fIe//voLERER6NWrV43N3zqdrgzzFHo/U3TLTN2mhNGAAQMQGBj4wgbHMD7YuHFj8sEHH9DLly/z0pNQ4082v56enpg2bRqcnZ3N2ilY8jKaPCZPnkyWLVsmOJnsd8nJyZg3bx7u3r1rkcg7tqmuX79OL1++bNTh0fCoPWHChCptEmtra4wfPx6dOnUSTIY7f/48IiMjafnfOzs7gwWW8EVyaTQaztclnpBqFwUFBTQtLU1w7hUKBZc8bMi8L126hD/++EOw8oenpyfefPNNKBSKCi0gzEEukUjQv3//MiHf5bFr1y4kJSWZpXpG+ffmbfDGUw/RsAWFkIlap9Ohc+fO2LlzJ1hAE17wAJmBAweSBQsWmEztERJqc+bMgSVSZCT1zRxRG449uVyOadOmkXfeeYfTmoTs7gkJCViwYAFSUlKoObUmw9yN48ePIyEhAXK5nJcI/Pz8MGbMGFLV+P7OnTuTHj16CP49LS0NkZGRRvlkNjY2xJT9vLS0lDdJToTlkZqaylWA56OVFi1acEEPhj2xQkNDudwlPsY9bNgwdOjQodI0xszrffr0Qf/+/QX9sikpKTh8+HCdKC/lu5QK+Unt7OwwadIk7N69Gy1atCAvi29UoVBgxowZMMUj+ODn54dp06ZVqt9TrZjspFIpXF1d4eDggNLSUrO8VGFhITw9PS0e2caOoY6Ojli1ahVJSkqiJ06c4GLq+YRGWFgYPv/8c2zYsAGOjo5mLdz54MEDGh4eblIjGTp0KDIyMmhV5poJ3xYtWsDKyooLcS2/MUNDQzFx4kTavn17YhjW7eXlxcv02D1iYmJQVFTEBU7UxgYuLS3FX3/9RZnZic8f5+HhAVdXV/IiarVs3hMTEyGXy8v0yWLz7+/vDzs7uzJM9dq1azQ8PLwM/ZdnTN7e3sjJyaFZWVmVXku9Xg8bGxu8+uqruHDhglGiLfv5hx9+wIIFC+Ds7Iz64pdh79i8eXPMnTsX06ZNQ6NGjV66CJ0OHTqQ6dOn02vXrlWoNLAIx/fffx+vvPKKRXxs1RJIzZo1wxdffIEuXbrwlm6vLoHY2dnBzc3N4hoKC1N1dnbGhg0bkJ6ejujoaCP/jeGE7927F97e3nTp0qXEHD132H0jIiIQGxsLU20wQkJCuICHqsynXC5HWlqaYIM/AIiMjMSZM2fQpk0b7p2USiU6deoER0dH3jwTAEhOTsbNmzdpQEAAKZ/NDwtl19+4cYOuWbMG6enpXL0stp6lpaWwtbXFp59+iiFDhqAuqm1YmnkWFhbi2LFjgoyDJbU6OTlxNFZaWoqIiAgkJycLBjNIpVL88ssvOH/+fJWVLZlMhidPnnAKHd++zcjIwPHjx+mMGTNqRCuGeTM19Uc7OztjxIgRmD9/Prp27UoqY6p8UTFq1CiuL5IpPkQpxdSpUzF8+HCL8WhZdRl68+bN0a5du+d29Zjpom3btmT9+vV09uzZXMvi8jlArObd5s2b0a5dO9q9e/caRQQalnPfuXNnmXp0fIiKirJo0Mjx48cxZcoUuLi4cKYXPz8/uLu7Cwqk7OxsREZGIiAgoNaaK/755584d+6cYK22xo0bc6kDL5oPgBCChIQEGhwcXCbvB+UK3jZr1qyMMpWcnExDQkJQXFwMmUzGW+6ruLgYrFyVOWmM/VxSUoI9e/Zg4sSJNSq8aY4UDEbLY8eOxY4dO4ihFeBlTWHw8PAggYGB9OzZs4LKKyEETk5OWLhwIVcv0hKQ1cTfw8xM5tREa7MMDSPwvn37kjVr1tCPP/4YiYmJRgyYlRdKS0vDsmXL8N5773HaYHU3CCEEUVFRiI6ONjK/CGmGNWHmpubg0qVLOHv2LJ04cSLnzG3SpAlatmyJP//8k5fJqNVqhISEYMyYMbRFixYWq//HEjQzMzNpSEiIUU8XpjD8010WrVu3fuGYC8vB2bJlC6/ZjSlR/fr1Q7t27cp85sSJE4iJieFK5tQVjcXExCA4OJi+9dZbVT4lseCEnj17wtvbW/AkptfroVAocOfOHa5eW/l3Y987ffo0Lly4QPv160de5sAcNnY/Pz/StWtXGhUVZWQpYvQ1ffp0zs9Y7wSSYXLs81x4kDl+x48fT/Ly8uinn37KG3/PNsHNmzexcuXKGiXxEkJQXFyM48ePozIday2VnGsYNff//t//w4gRIzifkLOzM+nVqxc9d+4c1Go1r2/g/PnzOHLkCBcmaymTh16vx/Xr1xESEsKZiA3njLVj6N27Nxch9aKY65hTfv/+/ZQFB5Q/HbHOsr169YKXlxfXiyYjI4OGhYWhtLS0wqaFlk4ALygowJkzZzB69GjehMyK9qiVlRWWLVvGmYtM4datW3TBggW4ePGikfWBKU5PnjzBRx99hKCgINq4cWPyIpl4q3sIqKj6ipubm8VyRV/asG+hxdDpdBg/fjyZO3cuAAiWTWHdVDMzM2u0gSMiIuixY8dMBjPU5vhv3ryJq1evUqZJy+VyDBgwAK1ateJNQGSFOn/99Vf88ccf1BIMjc1Leno6/eGHHzjzoeF8MYXI09MTQ4cORX1rSY8aRp1KJBJcunSJfvfdd7z5IoyJtm3bFsOGDeNOHoQQREZG4vLly4K5bbWlgbM1ioyMRExMDK2OD5YQAo1GA61WC61WC51Ox3tpNBp07NiRfPjhh2jevLmgr00qleLGjRtYv349V4z2ZT4pCRWZrc0oaFEglTMJODo6IjAwkLz77rsQaqvAIolqchLQaDQ4ceKEoH+GRbPIZDLu35pchvcSEi6FhYXYtm0bp0HqdDr4+voSlrnPp9ESQhAbG4vNmzcjJyeHCvk2anIyYGWOTpw4wWtyYmYZFxcX9OjRo1baYdQGNBoNpFIpbt26RVesWIHbt2+bNBEPHjwYXbp0IYbN53788Ufk5eXxMltWbLSmtFUZGmPPf/DgAU6dOoWioqJqKQ5sX1TUNUCn02HQoEFk3rx5Ru1ZDE+DKpUKe/fuxdGjR6mhCf9lV85Rh+4UUSCVCwd3cXHBmjVr0Lt3b0H/WE0J9+7du/TKlSuCDIaVymeaINMKq3sZ3ksoMVCv1+Py5cuIi4vjTklKpRJjxoyBnZ0dryBjp7ugoCD85z//MSraWdMghn+iv+h///tfLr2gvD9Ar9fDysoKU6ZMgZWV1XMdKcXGrdPpIJfLceHCBTp//nxERETw0gqjzVatWmHixImc2ZRSivj4eHrmzBmubxafwDcHbVWGxphioVarce7cOTx9+rRaibLl3QR8F0uEtba2xsyZM8n48eN5n8P2dk5ODjZt2oQLFy7QioKLRFgeMnEKjLVtd3d38u2339K5c+fi6tWrZjUDsZ5Ht2/f5j0ZUUrh4eGB/v37w87OziztwRlDKCkpQUREBB49esR76svMzMSRI0fg6+sLmUwGjUaDwYMHkylTptCtW7cK+qBYf5mioiK6YcMGtGzZklS35iFjFFKpFIcOHaKLFy8WbEbHnj98+HDMnTvXLOXv66IElqFZi83B5s2b6ebNmyFUlYExX61WiyVLlqBr166cH4RSisOHD3NtTPg6fLZt2xa+vr68BXhrYporLi7Gb7/9hqKiIt6eXvHx8QgLC0PTpk0t5ndkY3RycsK6deuQnJyMy5cvC5ru4uPjsW7dOjRr1ow2a9ZMrBYsCqT6F+jQpUsXsmbNGhoYGIj4+PgaCyW28ZKSkmhoaChvVB3L5Zg2bRqWLVtGhKpIVJdBqtVqfP3113T9+vVGDbcYcwsJCcHs2bNp8+bNCYtaev/993H58mXcvHnTZKHdoKAgJCYmYvny5XTIkCHV6mvFWmx///33dO3atVz1c6EEXWdnZyxZsgRWVlZ13jabCX5W5aIqScwajQb5+fm4ePEi/fLLLxEbGysYycmEl1arxXvvvYepU6eWKQAcFxdHt23bZuQXMHyfmTNnYt68ecSc5k1WPohSSg8cOGBUU08mkyEvL4/rlcSCCSyxZoxmvLy8yMqVK+mwYcN4FRqmxJw9exarV6/Gli1bYGdn99LmJNX5oUCcAmFb6eDBg8mHH36IJk2amC28/erVq4iOjhZ0Ktra2mLIkCGwsbGBUqks0w21uhfrsOro6IihQ4fC3d1dMIDgwYMHOH36dJly9S1btiSrV6+Gp6dnhdXf4+LiMHnyZHzwwQc0ODiYpqen0yqUxaFHjx6lc+bMocuWLeO6mgr1rJFIJFi6dCm6d+9eLyozG/aTKikpgUqlQmlpKe+lUqmQnZ2NpKQkeubMGfrNN9/QyZMn0ylTpiA6OtpkWgFTVAYOHIhVq1bBzs6ujDD+7bffBAMg9Ho9/Pz8MHDgQNjY2NSYtgwvW1tb2NjYYOrUqVyuSvnWBpRS3L17Fzdu3Kg1i8eQIUPI2rVrTZYXIoTgp59+wr59+6jYVkU8IdVbTJo0ieTm5tJPPvkExcXF1TopMWaZk5ODgwcP8tr02elowIAB6NChg2AgQU1PaB07diSDBw+mO3fuNDKnEEJQUFCAsLAwjBs3jrq5uXE5GqNGjSKpqal06dKlvO2MDX8uLS3F9u3b8dNPP2Hs2LHo2LEj9fLygoeHB5ycnGBvbw+VSoXi4mIUFBQgKysL9+/fR0xMDH799VejU5DQKXb8+PGYMWNGrZYvqkxF6pKSEmrqfZjy8ezZM6SlpeHKlSu8qQZC9de0Wi2GDBmCtWvXwtPTs0zW/KNHj2hkZKTJ9wwICEC7du2IpVIJBgwYQBo2bEiLi4uNlB65XI7Hjx/jwIEDGDBggMV7DrF5mTNnDrl79y7dvXs3L+0yYfnf//4Xbdq0oQMGDBAlkiiQUO+czHK5HO+99x65c+cO3b59O2+yXWWFQUxMDD1z5ozJCKI33ngDrq6uxBIJx1qtFnZ2dhgyZAh+/vlnFBcXG5ntdDodYmNjER8fDzc3tzLa5rRp00hubi5dsWIFF4VoSjirVCrs378fANCgQQM0bNgQDRo0gLW1NdRqNdRqNQoKCpCdnV0lhkwphb+/Pz755BO4u7vXm2KYOp0O4eHhYHXjzN3Dhs21v78/1qxZY3QypJTi1KlTXGWP8gEgOp0OjRo1Qv/+/S0mCCilUCqVCAwMRGBgoKBZLzw8HFFRUbR///61kpjaoEEDLF26FA8fPuTyk8pXZCGE4N69e1i7di1atGhBmzZtKgol0WRX/yLvbG1tsXr1aowaNYqrFFBVBkgpxa5du3hNKSyAoEuXLhg2bJjFIn1Y/oe/vz9atWolGNKelJSEw4cPIy8vr0x1aFtbWyxevJgsW7YM1tbW3OdNCU7GTHNzc3H//n1cu3YNERERiIqKQmxsLO7fvw9W0NPUnBoqAm3atMH//vc/dOrUidTXBmhVuSpKR2AavEwmw+uvv479+/ejR48exLCYKSEEqamp9OzZs7xdWtka9e3bF71797YYjbHxTJo0CU2bNuWtoi+Xy/HkyROcPHmyVv1+Pj4+ZPXq1fD29uY1wbP5OHfuHNatW4eCggKRCYoCqf5F3v2jWZJ169ahb9++nJZXmY3ENlxkZCT9/fffBZ3dCoUCgwcPBovysUS0GBOwXl5eZM6cOVyUU3m/jF6vR3h4OOLj4404lp2dHVavXk3Wr1+Pli1blmGWQvknhhUehC6hUyc7ObJ57N+/P3799Vf06NGjXpZ8EerTY+oSGrMh/TRv3hwrVqxAUFAQad68uVG+lV6vx507d3DhwgXBdZfL5Rg1ahQMTbEWzPonixYt4h0fU+qCg4Nx7949KtRKw1LmxPfff59LZeCjWYlEgl27dmH37t1Up9O9MInWokDCi9PUT6/Xo127dmTTpk3o2bNnpTU79rktW7agsLDQyH7NfEctWrTA22+/bfHKDWwso0ePhoODg9EYGKN78OABzp07Z+RcZ++3aNEisn37drz99ttwcHDgmIwpQVoVpsxOjuydXnnlFSxatAj79u2Dj48PqeuIOkspP3K5vEwzuVatWmHWrFnYt28fPvvsM6JUKmEY3s5OR9nZ2fTQoUO8pk8muNq3bw9/f/8yjnxLnhR79OgBd3d33lOSVCrFnTt3cOLECcFeSpZSyCZMmECmTJki+Fy9Xg+tVouNGzfi/Pnz9EWq/vFcCiSmoQldbNPUpYAwdVkiU9+wesHy5cvRvHlzjmnyvYNhK4fHjx/T69evC2a2KxQK9OnTBz4+PqS25vWVV14hw4cP551PVpH52LFjSExMpHxmJJYN//XXX+Ozzz6Dv78/V75FqVRCLpdXuYEXozu5XA6FQgGtVsuipLB582asW7eOeHh41GndsYporzIXowG5XM6NlTVn1Gg00Ov16NSpE+bOnYudO3diw4YNpFevXoQFw5Q/GQF/twMJDg4uQ1eGz6KUWvwEXh4dO3YkkydP5nyx5feoXC7H2bNnkZubC4VCQZhCIzRn5lhzVrU6MDAQfn5+XAI437w9efIEq1atQmJiYrWrkJS/b/kx1Ye8ufK0LfS+tbHnZELO2aKiIo7BgKfTaF1oDEyTzsvL430v1pZArVZbNIx06NCh5MMPP6Tz5s0rMw/snYqKirgyN3q9Ht9//z0ePnwoeF8HBwcMHTqUax9t6YVn45g3bx4OHjxoVJKHjSMuLg5HjhzBRx99xH2HCRh20mrcuDFZtGgRXn/9dXr06FFW267MswwrCAiZeJj2akhz/v7+mDBhAt544w14e3sT9pm6LA1UUFAguC9qiubNm6NHjx7o3bs3AgIC0KpVK+Lo6FgmYZivpTwA7N69G0+fPuW9r1arhZOTE15//XXI5fJaO5E0aNAAPXr0gLW1tVHLEDZ/Fy5cQHBwMB08eDBKSkoE5zU3N5fzv9Y0ovKfyvBk9erVdMaMGUhPTxes23bp0iUsXLgQ+/btg6OjY5WfnZ+fL8iPdDodCgsL60VlCL1ez/HV8mvA/s/n/64VgeTg4ICBAwciOTnZyM+g1+vh6upapgkYatFhLJVK0bFjRwwZMsTo2VKpFCUlJRZrQcDuJ5fLMX36dJKenk4jIyPLZNprtVq4ubnBxcUFAJCVlUXVajUGDhzIW3KfacO9evXi/De1MaeEEHTr1o189NFHlFWjKD+XGo0GRUVFKCoqAl+SKxNSSqUSPj4+xMfHB2PGjKERERGIj4/H1atXERcXZ7K1BnhCknv06IGOHTti0KBBnEbPBFpdCCPD9fD390dycrJgu3lUsnW0QqGAo6MjGjduDBcXF3h6eqJ169Zo0aJFmYTiigJHWPkbvV6PQYMG8VZmKC0tRf/+/eHv71+rEYmUUgQEBGDWrFm4c+cOyhdVlUgkUKlUSEtLg1arRadOnVBSUlJmrEwJsba2hoeHh9nqVur1egwdOpR8/vnn9LfffuMteWRYeDk6Opq+9tprlTYVs8+0a9cOw4YN40zhhqZvQgjatWsHhUKBus6dk8lk8Pf3L3OiLp+43b59e8u/D590ZlnjWq2W8k2+TCYj9vb2NWrBUBMiLywsRElJCRWS9Pb29sSSTaQYMWk0GuTk5FC+ciQODg5EoVBwoc06nY4K5dXY2NgQW1vbOjGDqlQq5OfnUxPHeOLo6Giyf41h0AKDWq1Geno6TUhIwI0bN/D06VNkZGRwiaElJSWwtbWFg4MD3Nzc0LhxY3To0AE+Pj5wc3MjfI326oPPqKSkBPn5+bQm7yKVSolEIoFSqYSNjY1gknJlA2fUajUKCwuh1WqpUM6Tg4MD4XtWbSA/Px8qlYqa6DpLHBwcUFBQAI1GQ4XmzMHBwew8R6vVIjc3l5YXGHzPZ0pmVfdXQUEBFbqvlZUVsbe3r3PappRy6yQUnOTg4ECsra1rXyCJqLxQEmEctMDHSDUaDdRqNfR6PXcxezXzpfAx5ZehR41hIEt1UgpEiHhRICiQKhJUdV0zrD50njX1HkK2/vo2n5Z6N1PCyZzfqe+FU2urS/KLQGN1wXOqsp7V3Qf1dV3q47uKJyQR9YLYxVOBCBEiRIEkQoQIESIgJsaKECFChAgRokASIUKECBGiQBIhQoQIESJEgSRChAgRIkSBJEKECBEiRIgCSYQIESJEiAJJhAgRIkSIEAWSCBEiRIgQBZIIESJEiBAhCiQRIkSIECEKJBEiRIgQIUIUSCJEiBAhQhRIIkSIECFChCiQRIgQIUKEKJBEiBAhQoQIUSCJECFChAhRIIkQIUKECBGiQBIhQoQIEaJAEiFChAgRIkSBJEKECBEiXkTIxCl4kUEBqv/7XxBxOmoKvTgFZgEhgETUhUWIAunlEUQg0BU+pgXXl0OTcw2QKv8RTiKqPJVyCpKuhPx3J5AMyd+7hopTU2VIJKBFRZAPHQTrj94nxN4OoPRvASVChCiQXnBeqtdBk5sIdeZdEKlEFEjVFUhKgKRIQeIbgmTIARkVBVJ1IJWC5udD0tob0Gn/mV9RIIkQBdLLAyIFkUpBFI4A1YrzUWWBREBlpSByGYiDM1CiF09I1eY20r8FkUwqzoUIUSC9lOq9XgOq1QEkH6A6cUqq44YjFFQjAS3IBXIByEWBVF2BRPMLALVanAsRokB66Q5HEgUkNm6Q2r0CIpWJAqm6JjsFIHFUgLg5gugkokCqLiRSUCsbECcnMahBBD/PolTcWS8sL9WVQpt9m1JtHkQ7Uw0EkoQCpVJIMuWAmogBizWIrqMaDSQuzpC2bkUgE/VhEaJAEiFChAgREE12Imr/mCSejMx1UqLi0cg8J04xD0mEeEISIUKECBEQSweJECFChAgRokASIUKECBH1H/8f6YkXzsGacdgAAAAASUVORK5CYII=" alt="Fnac Darty"><span>Document confidentiel — usage interne Fnac Darty · PilotPerf</span></div>
 <div id="zoneImpr"></div>
+<div class="tv-bandeau" aria-hidden="true"><span class="tv-pt"></span><b id="tvTitre"></b><span id="tvPos" class="note"></span><span id="tvHeure" class="tv-h"></span>
+  <button class="btn sm" onclick="TV.i++;tvAfficher()">Suivant ›</button><button class="btn sm" onclick="quitterTV()">✕ Quitter</button><i id="tvBarre"></i></div>
+<div class="voile" id="voileGuide" onclick="if(event.target===this)fermerGuide()">
+  <div class="boite guide">
+    <h3>❔ Guide PilotPerf</h3>
+    <div class="guide-g">
+      <div><b>🔄 Actualiser</b><p>Relit le dossier OneDrive configuré : seuls les fichiers nouveaux ou modifiés sont lus. L'actualisation automatique se règle dans Sources &amp; OneDrive.</p></div>
+      <div><b>⌕ Recherche</b><p>Nom, code (485, IS51798), n° de dossier, atelier, marque, magasin ou pièce. Combinez : <code>485 semaine 46</code>, <code>AIR TAN</code>, <code>dyson +30j</code>. Touche <code>/</code>.</p></div>
+      <div><b>🎛 Filtres</b><p>Site, atelier et période s'appliquent à tous les écrans. Les encours sont une photographie à date : la période ne s'y applique pas.</p></div>
+      <div><b>★ Vues enregistrées</b><p>Mémorisez un écran avec ses filtres (ex. « Robots du mois ») et retrouvez-le en un clic.</p></div>
+      <div><b>🧭 Pilotage</b><p>Les dossiers à traiter : retards sur date promise, échéances, futurs +30 j, bloqués, pièces, devis sans réponse, sans action.</p></div>
+      <div><b>🖨 Imprimer / ⬇ Image / Excel</b><p>Survolez un graphique ou un tableau : imprimer, enregistrer en image ou exporter vers Excel. Filigrane « Confidentiel » et logo Fnac Darty ajoutés.</p></div>
+      <div><b>📄 Rapport</b><p>Sur le tableau de bord : une synthèse de la période prête à enregistrer en PDF.</p></div>
+      <div><b>📺 Écran atelier</b><p>Plein écran, les tableaux défilent seuls. → pour passer, Échap pour quitter.</p></div>
+      <div><b>⌨️ Raccourcis</b><p><code>/</code> recherche · <code>Alt + ←</code> retour · <code>Échap</code> fermer · <code>↑ ↓ Entrée</code> dans les menus.</p></div>
+      <div><b>🔒 Administration</b><p>Ajouter des fichiers, choisir les dossiers, ouvrir une sauvegarde et modifier les réglages demandent le mot de passe.</p></div>
+    </div>
+    <div class="rangee" style="justify-content:flex-end;margin-top:12px"><button class="btn pri" onclick="fermerGuide()">Compris</button></div>
+  </div>
+</div>
 <div class="voile" id="voileAdmin" onclick="if(event.target===this)fermerAdmin()">
   <form class="boite" id="boiteAdmin" onsubmit="validerAdmin(event)">
     <h3>🔒 Accès administrateur</h3>
@@ -668,6 +714,8 @@ const TYPES = {
   HD:      { nom:'Encours hors délais', court:'Hors délais', icone:'⚠️', date:false },
   P30:     { nom:'Encours de plus de 30 jours', court:'+30 jours', icone:'🕰️', date:false },
   PILOT:   { nom:'PilotAtelier (heures saisies)', court:'PilotAtelier', icone:'⏱', date:true },
+  HEURES:  { nom:'Heures des intervenants', court:'Heures', icone:'🕘', date:true },
+  PIECES:  { nom:'Pièces consommées', court:'Pièces', icone:'🔩', date:true },
   GEN:     { nom:'Fichier générique', court:'Générique', icone:'📄', date:false }
 };
 function detecterType(set){
@@ -678,7 +726,40 @@ function detecterType(set){
   if(a('DELAI RECEP NOW') || (a('NUM DOS NOMAD') && a('DATE ENTREE ATELIER') && a('NOM TECH'))) return 'ENCOURS';
   if(a('TRANCHE AGE PRESTA') && a('ACTEUR')) return 'HD';
   if(a('AGE PRESTA') && a('TECHNICIEN')) return 'P30';
+  const un = L => L.some(a);
+  // Pièces consommées : une référence + une quantité
+  if(un(COLS_PIECES.ref) && un(COLS_PIECES.qte)) return 'PIECES';
+  // Heures : un intervenant + une date + une durée (ou début/fin)
+  if(un(COLS_HEURES.qui) && un(COLS_HEURES.date) && (un(COLS_HEURES.h) || (un(COLS_HEURES.deb) && un(COLS_HEURES.fin)))) return 'HEURES';
   return 'GEN';
+}
+/* Noms de colonnes acceptés pour les futurs fichiers heures et pièces (en-têtes normalisés, sans accent) */
+const COLS_PIECES = {
+  ref:['REF PIECE','REFERENCE PIECE','CODE PIECE','REF ARTICLE','REFERENCE ARTICLE','CODE ARTICLE','REF','REFERENCE','ARTICLE','NUM PIECE','PIECE'],
+  lib:['DESIGNATION','LIBELLE','LIBELLE PIECE','DESIGNATION PIECE','LIBELLE ARTICLE','DESCRIPTION'],
+  qte:['QTE','QUANTITE','QTE CONSO','QTE CONSOMMEE','QUANTITE CONSOMMEE','QTE PIECE','NB PIECE','NB PIECES','QTE SORTIE'],
+  pu:['PRIX UNITAIRE','PU','PRIX','PRIX ACHAT','PMP','COUT UNITAIRE','PRIX HT'],
+  tot:['MONTANT','MONTANT HT','COUT','COUT TOTAL','VALEUR','TOTAL HT','MONTANT TOTAL'],
+  date:['DATE CONSO','DATE CONSOMMATION','DATE SORTIE','DATE MOUVEMENT','DATE AFFECTATION','DATE','DATE TERMINE ATELIER','DATE INTER'],
+  qui:['CODE TECH','CODE TECHNICIEN','CODE INTERVENANT','TECHNICIEN','INTERVENANT','NOM TECH','MATRICULE','UTILISATEUR']
+};
+const COLS_HEURES = {
+  qui:['CODE INTERVENANT','CODE TECH','CODE TECHNICIEN','MATRICULE','CODE SALARIE','CODE','INTERVENANT','TECHNICIEN','NOM TECH','NOM','SALARIE','COLLABORATEUR'],
+  date:['DATE','JOUR','DATE PRESENCE','DATE JOUR','DATE POINTAGE'],
+  h:['HEURES','NB HEURES','HEURES PRESENCE','TEMPS PRESENCE','DUREE','HEURES TRAVAILLEES','TOTAL HEURES','TEMPS TRAVAIL','HEURES REALISEES','TEMPS'],
+  deb:['HEURE DEBUT','DEBUT','HEURE ARRIVEE','ARRIVEE','ENTREE','HEURE ENTREE'],
+  fin:['HEURE FIN','FIN','HEURE DEPART','DEPART','SORTIE','HEURE SORTIE'],
+  pause:['PAUSE','DUREE PAUSE','PAUSE DEJEUNER','PAUSE REPAS'],
+  abs:['ABSENCE','TYPE ABSENCE','MOTIF','MOTIF ABSENCE','CODE ABSENCE']
+};
+/* Durée → heures décimales : 7,5 · « 7h30 » · « 07:30 » · fraction de journée Excel */
+function versDuree(v){
+  if(v == null || v === '') return null;
+  if(typeof v === 'number') return v > 0 && v < 1 ? v * 24 : (v >= 0 && v <= 24 ? v : null);
+  const s = String(v).trim().replace(',', '.');
+  let m = s.match(/^(\d{1,2})\s*[hH:]\s*(\d{1,2})?/); if(m) return +m[1] + (+(m[2] || 0)) / 60;
+  m = s.match(/^\d+(\.\d+)?$/); if(m){ const x = +s; return x >= 0 && x <= 24 ? x : null; }
+  return null;
 }
 /* Ligne d'en-tête = la plus fournie en libellés parmi les 15 premières */
 function trouverEnTete(rows){
@@ -736,7 +817,7 @@ function normaliser(type, H, rows, siteFichier, fichier, liens){
           iRet = col('NB RET ATELIER'), iPcs = col('NB PIECES UTILISEES'), iDv = col('DEVIS NOMAD EMIS'), iRd = col('REP DEVIS'),
           iSst = col('SOUS TRAITANCE'), iSt = col('DERN STATUT'), iTir = col('TYPE INTER REALISE'), iHr = col('HEURE CODE TERM ATL'),
           iDep = col('DATE DEPOT'), iDem = col('NB DEM PIECE'), iDDem = col('DATE DERN DEM PIECE'), iDAffP = col('DATE DERN AFF PIECE'),
-          iMt = col('MT DEVIS TTC'), iDAff = col('DATE AFF DERN TECH');
+          iMt = col('MT DEVIS TTC'), iDAff = col('DATE AFF DERN TECH'), iPrix = col('PRIX ACHAT'), iCp = col('CP CLIENT');
     rows.forEach(r => {
       const o = base(r); o.d = versDate(g(r, iD)); if(!o.d) return;
       const dr = versDate(g(r, iRec)); const dl = joursEntre(dr, o.d); if(dr) o.dr = dr;
@@ -750,6 +831,9 @@ function normaliser(type, H, rows, siteFichier, fichier, liens){
       const dlP = jPos(versDate(g(r, iDDem)), versDate(g(r, iDAffP))); if(dlP != null && o.dem) o.dlP = dlP;
       const mt = versNb(g(r, iMt)); if(mt) o.mtDv = mt;
       const dAff = versDate(g(r, iDAff)); if(dAff) o.dlAff = jPos(dAff, o.d);
+      const pa = versNb(g(r, iPrix)); if(pa > 0) o.prix = pa;
+      const cp = String(g(r, iCp) == null ? '' : g(r, iCp)).replace(/\D/g, '').padStart(5, '0');
+      if(/^\d{5}$/.test(cp) && cp !== '00000') o.dep = /^9[78]/.test(cp) ? cp.slice(0, 3) : (cp.slice(0, 2) === '20' ? (+cp < 20200 ? '2A' : '2B') : cp.slice(0, 2));
       const c = refC(g(r, iC)), u = refN(g(r, iU)), uc = refI(g(r, iUc));
       o.p = c || u || uc; o.pa = refN(g(r, iAff)); o.pk = refC(g(r, iTop));
       lien(c, u, uc);
@@ -792,15 +876,52 @@ function normaliser(type, H, rows, siteFichier, fichier, liens){
     const iAge = col('DELAI RECEP NOW'), iAgeSt = col('DELAI DERNSTATUT NOW'), iSt = col('DERN STATUT'), iSst = col('SOUS TRAITANCE'),
           iRet = col('NB RET ATELIER'), iDem = col('NB DEM PIECE'), iT = col('NOM TECH'), iRc = col('CODE INTERVENANT RECEPTION'),
           iRn = col('NOM RECEP'), iRec = col('DATE RECEP ATL'), iDispo = col('DATE DISPO'),
-          iDtr = col('DELAI DEPOT RECEP'), iPaff = col('NB PIECES AFF'), iDlDem = col('DELAI DERN DEM PIECE'), iNowDispo = col('DELAI NOW DISPO');
+          iDtr = col('DELAI DEPOT RECEP'), iPaff = col('NB PIECES AFF'), iDlDem = col('DELAI DERN DEM PIECE'), iNowDispo = col('DELAI NOW DISPO'),
+          iDv1 = col('PREM DATE EMIS DEVIS NOMAD'), iDvR = col('DERN DATE REP DEVIS NOMAD'), iDlDv = col('DELAI DEVIS');
     rows.forEach(r => {
       const o = base(r); if(!o.dos && !o.inter) return;
       o.age = versNb(g(r, iAge)); o.ageSt = versNb(g(r, iAgeSt)); o.st = normTxt(g(r, iSt));
       o.sst = oui(g(r, iSst)) ? 1 : 0; o.ret = versNb(g(r, iRet)) || 0; o.dem = versNb(g(r, iDem)) || 0;
       o.dRec = versDate(g(r, iRec)); o.dDispo = versDate(g(r, iDispo));
       o.dlTr = versNb(g(r, iDtr)); o.paff = versNb(g(r, iPaff)) || 0; o.dlDem = versNb(g(r, iDlDem)); o.nowDispo = versNb(g(r, iNowDispo));
+      const dv1 = versDate(g(r, iDv1)); if(dv1){ o.dDv = dv1; o.dRepDv = versDate(g(r, iDvR)) || ''; o.dlDv = versNb(g(r, iDlDv)); }
       o.p = refN(g(r, iT));
       const rc = refI(g(r, iRc)), rn = refN(g(r, iRn)); o.pr = rc || rn; lien(rc, rn);
+      recs.push(o);
+    });
+  } else if(type === 'HEURES'){
+    const c = L => col(...L);
+    const iQ = c(COLS_HEURES.qui), iD = c(COLS_HEURES.date), iH = c(COLS_HEURES.h), iDeb = c(COLS_HEURES.deb), iFin = c(COLS_HEURES.fin),
+          iPau = c(COLS_HEURES.pause), iAbs = c(COLS_HEURES.abs), iNom = col('NOM','NOM PRENOM','NOM TECH','INTERVENANT');
+    rows.forEach(r => {
+      const d = versDate(g(r, iD)); if(!d) return;
+      let h = iH >= 0 ? versDuree(g(r, iH)) : null;
+      if(h == null && iDeb >= 0 && iFin >= 0){ const a = versDuree(g(r, iDeb)), b = versDuree(g(r, iFin)); if(a != null && b != null && b > a) h = b - a - (versDuree(g(r, iPau)) || 0); }
+      if(!(h > 0)) return;
+      const q = g(r, iQ), qs = txt(q);
+      const ref = /^[A-Z0-9]{2,4}$/i.test(qs) ? refC(qs) : (/^IS\d+|^[A-Z]{2,}\d+/i.test(qs) ? refI(qs) : refN(qs));
+      if(!ref) return;
+      if(iNom >= 0 && iNom !== iQ){ const nm = refN(g(r, iNom)); if(nm && nm !== ref) lien(ref, nm); }
+      recs.push({ src:'PILOT', n:1, f:fichier, d, site:siteFichier, atl:'', p:ref, h:Math.round(h * 100) / 100, tps:0, nbp:0, nbr:0,
+        abs: iAbs >= 0 ? normTxt(g(r, iAbs)) : '', savedAt:'9999' });
+    });
+  } else if(type === 'PIECES'){
+    const c = L => col(...L);
+    const iR = c(COLS_PIECES.ref), iL = c(COLS_PIECES.lib), iQ = c(COLS_PIECES.qte), iPu = c(COLS_PIECES.pu), iTot = c(COLS_PIECES.tot),
+          iD = c(COLS_PIECES.date), iQui = c(COLS_PIECES.qui);
+    // N° de dossier / d'intervention sous un autre libellé (« N° dossier », « Numéro dossier »…)
+    const parMot = mot => H.findIndex(h => h.indexOf(mot) >= 0 && h.indexOf('DATE') < 0);
+    const iDos2 = iDos >= 0 ? -1 : parMot('DOSSIER'), iInt2 = iInter >= 0 ? -1 : parMot('INTER');
+    rows.forEach(r => {
+      const o = base(r); const ref = normTxt(g(r, iR)); if(!ref) return;
+      if(!o.dos && iDos2 >= 0) o.dos = txt(g(r, iDos2)); if(!o.inter && iInt2 >= 0 && iInt2 !== iQui) o.inter = txt(g(r, iInt2));
+      o.ref = ref; o.lib = txt(g(r, iL)) || ref;
+      o.qte = versNb(g(r, iQ)); if(o.qte == null) o.qte = 1; if(!o.qte) return;
+      const pu = versNb(g(r, iPu)), tot = versNb(g(r, iTot));
+      o.cout = tot ? tot : (pu ? pu * o.qte : 0);
+      o.d = versDate(g(r, iD)) || '';
+      const q = txt(g(r, iQui)); if(q) o.p = /^[A-Z0-9]{2,4}$/i.test(q) ? refC(q) : (/^IS\d+/i.test(q) ? refI(q) : refN(q));
+      delete o.cli; delete o.ser;
       recs.push(o);
     });
   } else if(type === 'HD' || type === 'P30'){
@@ -974,7 +1095,9 @@ const CLE = {
   SORTIE: r => r.inter + '|' + r.dos + '|' + r.d + '|' + r.cop,
   TERMJ1: r => r.inter + '|' + r.dos + '|' + r.d,
   EVT:    r => r.dos + '|' + r.inter + '|' + r.d + '|' + r.hr + '|' + r.ev + '|' + r.p + '|' + (r.com || ''),
-  PILOT:  r => r.p + '|' + r.d
+  PILOT:  r => r.p + '|' + r.d,
+  HEURES: r => r.p + '|' + r.d,
+  PIECES: r => r.dos + '|' + r.inter + '|' + r.d + '|' + r.ref + '|' + r.qte + '|' + r.cout
 };
 function reconstruire(){
   const recs = [];
@@ -991,15 +1114,15 @@ function reconstruire(){
   BASE.fichiers.forEach(f => {
     f.ignore = !!(photoRetenue[f.type] && photoRetenue[f.type] !== f);
     if(f.ignore) return;
-    const cle = CLE[f.type];
+    const cle = CLE[f.type], tk = f.type === 'HEURES' ? 'PILOT' : f.type;
     f.doublons = 0;
     for(const r of f.recs){
       if(cle){
-        const k = cle(r), m = vus[f.type] || (vus[f.type] = new Map()), ex = m.get(k);
+        const k = cle(r), m = vus[tk] || (vus[tk] = new Map()), ex = m.get(k);
         if(ex){
           f.doublons++;
           // PilotAtelier : la journée enregistrée le plus récemment l'emporte
-          if(f.type === 'PILOT' && (r.savedAt || '') > (ex.r.savedAt || '')){ recs[ex.i] = r; m.set(k, { r, i:ex.i }); }
+          if((f.type === 'PILOT' || f.type === 'HEURES') && (r.savedAt || '') > (ex.r.savedAt || '')){ recs[ex.i] = r; m.set(k, { r, i:ex.i }); }
           continue;
         }
         m.set(k, { r, i:recs.length });
@@ -1076,10 +1199,11 @@ const DIMS = {
   ENCOURS: ['site','atl','fam','p','pr','st','tranche','sst','ret1'],
   HD:      ['site','atl','fam','p','st','act'],
   P30:     ['site','atl','fam','p','st','tranche'],
-  PILOT:   ['d','site','p']
+  PILOT:   ['d','site','p'],
+  PIECES:  ['d','site','atl','fam','mq','ref','lib']
 };
-const SOMMES = { SORTIE:['ta','ri30','ri90','taR30'], TERMJ1:['ta'], PILOT:['h','tps','nbp','nbr'] };
-const NUMERIQUES = ['n','dlS','dlN','ageS','ageN','pcs','ta','ri30','ri90','taR30','h','tps','nbp','nbr'];
+const SOMMES = { SORTIE:['ta','ri30','ri90','taR30'], TERMJ1:['ta'], PILOT:['h','tps','nbp','nbr'], PIECES:['qte','cout'] };
+const NUMERIQUES = ['n','dlS','dlN','ageS','ageN','pcs','ta','ri30','ri90','taR30','h','tps','nbp','nbr','qte','cout'];
 function trancheAge(a){ if(a == null) return 'NR'; if(a < 7) return '<7'; if(a < 14) return '7-13'; if(a < 21) return '14-20'; if(a < 30) return '21-29'; return '30+'; }
 function fabriquerInstantane(){
   const dico = [''], idx = new Map([['', 0]]);
@@ -1233,6 +1357,7 @@ function filtrer(recs, opts){
     if(CHIPS.ens && r.ens && r.ens !== CHIPS.ens) return false;
     if(CHIPS.mq && r.mq !== CHIPS.mq) return false;
     if(CHIPS.ld && (r.src === 'SORTIE' || r.src === 'ENCOURS' || r.src === 'TERMJ1') && r.ld !== CHIPS.ld) return false;
+    if(CHIPS.ref && r.src === 'PIECES' && r.ref !== CHIPS.ref) return false;
     if(CHIPS.fam && r.fam !== CHIPS.fam) return false;
     if(opts.pers && !(r._p === opts.pers || (opts.tousRoles && (r._pa === opts.pers || r._pr === opts.pers || r._pk === opts.pers)))) return false;
     return true;
@@ -1289,9 +1414,9 @@ function efficience(Lso, Lpil, pidSeul){
 }
 function srcHeures(E){
   if(!E.jPil && !E.jEst) return '—';
-  if(!E.jEst) return 'PilotAtelier';
+  if(!E.jEst) return 'heures réelles';
   if(!E.jPil) return 'estimées ' + (REG.heuresJour || 7) + ' h/j';
-  return E.jPil + ' j PilotAtelier · ' + E.jEst + ' j estimés';
+  return E.jPil + ' j réels · ' + E.jEst + ' j estimés';
 }
 function pillEff(v){ return pillP(v, [85, 100]); }
 /* Les réparations des 30 derniers jours n'ont pas encore eu le temps de revenir */
@@ -1431,7 +1556,7 @@ function rendre(){
   rendreChips();
   if(vide){ rendreSources(); return; }
   detruire();
-  if(VUE === 'bord') rendreBord();
+  if(VUE === 'bord'){ rendreBord(); ajoutBord(); }
   else if(VUE === 'inter') rendreIntervenants();
   else if(VUE === 'atl') rendreAteliers();
   else if(VUE === 'enc') rendreEncours();
@@ -1439,16 +1564,17 @@ function rendre(){
   else if(VUE === 'fiche') rendreFiche();
   else if(VUE === 'src') rendreSources();
   else if(VUE === 'pilot') rendrePilotage();
-  else if(VUE === 'flux') rendreFlux();
-  else if(VUE === 'qual') rendreQualite();
-  else if(VUE === 'mag') rendreMagasins();
+  else if(VUE === 'flux'){ rendreFlux(); ajoutFlux(); }
+  else if(VUE === 'qual'){ rendreQualite(); ajoutQualite(); }
+  else if(VUE === 'mag'){ rendreMagasins(); ajoutMag(); }
+  else if(VUE === 'pieces') rendrePieces();
   $('bdInter').textContent = BASE.personnes.size;
   majBadgePilot();
   outilsCartes();
   if(typeof majSelects === 'function') majSelects();
 }
 const TITRES = { bord:'Tableau de bord', pilot:'Pilotage des encours', perf:'Efficience & retours', inter:'Intervenants', flux:'Flux & organisation',
-  qual:'Qualité & pannes', mag:'Magasins de dépôt', atl:'Ateliers', enc:'Encours & délais', fiche:'Fiche', src:'Sources & OneDrive' };
+  qual:'Qualité & pannes', pieces:'Pièces consommées', mag:'Magasins de dépôt', atl:'Ateliers', enc:'Encours & délais', fiche:'Fiche', src:'Sources & OneDrive' };
 /* ── Historique de navigation : flèche retour, bouton « précédent » du navigateur ou de la souris, Alt + ← ── */
 const HIST = [];
 let HISTO_NAV = true;
@@ -1538,13 +1664,13 @@ function rendreBord(){
 
   h += '<div class="sec-t"><h2>Indicateurs clés</h2><span>Repères colorés indicatifs : vert = objectif atteint</span></div><div class="grid g-gauge">';
   if(E && E.eff != null){
-    h += jauge('Efficience du site', E.eff, { min:0, max:130, zones:ZONES_EFF, libMax:'130', det:'heures : ' + srcHeures(E) });
-    h += jauge('Retours sous 30 j', E.tauxRet, { min:0, max:20, zones:ZONES_RET, libMax:'20 %', det: fmtN(E.ri30) + ' sur ' + fmtN(E.tar) + ' réparés' });
+    h += jauge('Efficience du site', E.eff, { min:0, max:130, zones:zonesObj('eff'), libMax:'130', det:'objectif ' + objectif('eff') + ' % · heures : ' + srcHeures(E) });
+    h += jauge('Retours sous 30 j', E.tauxRet, { min:0, max:20, zones:zonesObj('ret'), libMax:'20 %', det: fmtN(E.ri30) + ' sur ' + fmtN(E.tar) + ' réparés · objectif ≤ ' + objectif('ret') + ' %' });
   }
   if(has('SORTIE')){
-    h += jauge('Taux de réparation', K.tar, { det: fmtN(K.nTar) + ' TAR / ' + fmtN(K.nSo) });
+    h += jauge('Taux de réparation', K.tar, { zones:zonesObj('tar'), det: fmtN(K.nTar) + ' TAR / ' + fmtN(K.nSo) + ' · objectif ' + objectif('tar') + ' %' });
     h += jauge('Sans retour atelier', K.ret == null ? null : 100 - K.ret, { zones:[[0,80,'err'],[80,90,'warn'],[90,100,'ok']], det:'appareils jamais revenus' });
-    h += jauge('Délai de réparation', K.dl, { min:0, max:40, zones:[[0,15,'ok'],[15,25,'warn'],[25,41,'err']], fmt:fmtJ, libMax:'40 j', det:'moyenne en jours' });
+    h += jauge('Délai de réparation', K.dl, { min:0, max:40, zones:zonesObj('dl'), fmt:fmtJ, libMax:'40 j', det:'moyenne · objectif ≤ ' + objectif('dl') + ' j' });
     if(K.nDevis) h += jauge('Devis acceptés', K.devis, { zones:[[0,40,'err'],[40,60,'warn'],[60,100,'ok']], det: fmtN(K.nDevis) + ' devis avec réponse' });
   }
   if(has('ENCOURS')) h += jauge('Encours de moins de 14 j', K.nEn ? K.en14 / K.nEn * 100 : null, { zones:[[0,60,'err'],[60,80,'warn'],[80,100,'ok']], det: fmtN(K.en14) + ' sur ' + fmtN(K.nEn) });
@@ -1727,10 +1853,10 @@ function rendreAteliers(){
     .sort((x, y) => (y.K.nSo + y.K.nEn) - (x.K.nSo + x.K.nEn));
   $('v-atl').innerHTML = '<div class="sec-t" style="margin-top:4px"><h2>Ateliers</h2><span>' + A.length + ' atelier(s) · ' + echap(bornes().lib) + '</span></div>' +
     '<div class="grid g-3">' + A.map(({ a, K }) =>
-      '<div class="carte" style="cursor:pointer" onclick="ouvrirFiche(\'atl\',\'' + echap(a) + '\')"><div style="display:flex;justify-content:space-between;align-items:center"><h3>🏭 ' + echap(a) + '</h3>' + pillP(K.tar) + '</div>' +
+      '<div class="carte" style="cursor:pointer" onclick="ouvrirFiche(\'atl\',\'' + echap(a) + '\')"><div style="display:flex;justify-content:space-between;align-items:center"><h3>🏭 ' + echap(a) + '</h3>' + pillP(K.tar, [objectif('tar', a) - 10, objectif('tar', a)]) + '</div>' +
       '<div class="grid" style="grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px">' +
       mini('Terminés', fmtN(K.nSo)) + mini('Délai moy.', fmtJ(K.dl)) + mini('Revenus', fmtP(K.ret, 0)) + mini('Encours', fmtN(K.nEn || K.nHd)) + mini('30 j +', fmtN(K.en30 || K.nP30)) + mini('Événements', fmtN(K.nEv)) +
-      '</div></div>').join('') + '</div>';
+      '</div>' + (K.nSo ? '<div class="rangee" style="gap:6px;margin-top:10px">' + badgeObj('tar', K.tar, a) + badgeObj('dl', K.dl, a) + '</div>' : '') + '</div>').join('') + '</div>';
 }
 function mini(l, v){ return '<div style="background:var(--surface-2);border-radius:12px;padding:8px 10px"><div class="note" style="font-size:11px">' + l + '</div><div class="num" style="font-weight:800;font-size:17px">' + v + '</div></div>'; }
 
@@ -2012,6 +2138,7 @@ function pilotageData(){
     bascule: en.filter(r => r.age != null && r.age >= 23 && r.age <= 29).sort((a, b) => b.age - a.age),
     bloques: en.filter(r => r.ageSt != null && r.ageSt >= REG.seuilBloque).sort((a, b) => b.ageSt - a.ageSt),
     pieces: en.filter(r => r.dem > (r.paff || 0)).sort((a, b) => (b.dlDem || 0) - (a.dlDem || 0)),
+    devis: en.filter(r => { if(!r.dDv || r.dRepDv) return false; r._dvJ = joursEntre(r.dDv, photo); return r._dvJ >= (REG.seuilDevis || 7); }).sort((a, b) => b._dvJ - a._dvJ),
     dormants: [] };
   if(D.evts){
     en.forEach(r => {
@@ -2030,6 +2157,7 @@ const SEGS = {
   bascule:  { lib:'Passeront 30 j sous 7 jours', ic:'⏳', coul:'--s2' },
   bloques:  { lib:'Bloqués au même statut', ic:'🧱', coul:'--s7' },
   pieces:   { lib:'En attente de pièces', ic:'🔩', coul:'--s4' },
+  devis:    { lib:'Devis sans réponse', ic:'🧾', coul:'--s1' },
   dormants: { lib:'Sans action récente', ic:'💤', coul:'--muted' }
 };
 function rendrePilotage(){
@@ -2040,7 +2168,7 @@ function rendrePilotage(){
     const s = SEGS[k], n = D[k].length;
     const det = k === 'retard' ? (n ? 'jusqu\'à ' + Math.abs(D.retard[0].nowDispo) + ' j de retard' : 'aucun dossier') :
       k === 'echeance' ? 'date de mise à disposition proche' : k === 'bascule' ? 'âge actuel 23 à 29 j' :
-      k === 'bloques' ? REG.seuilBloque + ' j ou plus au même statut' : k === 'pieces' ? 'pièces demandées non affectées' :
+      k === 'bloques' ? REG.seuilBloque + ' j ou plus au même statut' : k === 'pieces' ? 'pièces demandées non affectées' : k === 'devis' ? 'émis depuis ' + (REG.seuilDevis || 7) + ' j ou plus · client à relancer' :
       (D.evts ? 'aucun événement depuis ' + REG.seuilDormant + ' j ou plus' : 'chargez le fichier événements');
     return kpi(s.lib, fmtN(n), det, s.coul, '', { ic:s.ic, clic:"SEG_PILOT='" + k + "';rendre();document.getElementById('listePilot').scrollIntoView({behavior:'smooth',block:'start'})" });
   }).join('') + '</div>';
@@ -2055,12 +2183,13 @@ function rendrePilotage(){
     '<div class="rangee" style="margin-bottom:10px"><div class="seg">' + Object.keys(SEGS).map(k => '<button class="' + (k === SEG_PILOT ? 'on' : '') + '" onclick="SEG_PILOT=\'' + k + '\';rendre()">' + SEGS[k].ic + ' ' + SEGS[k].lib.replace('Passeront 30 j sous 7 jours', '30 j sous 7 j').replace('En retard sur la date promise', 'Retard date promise') + '<span class="bd">' + D[k].length + '</span></button>').join('') + '</div>' +
     '<span class="note" style="margin-left:auto">Seuils : bloqué ≥ <input class="champ num" type="number" min="1" max="90" value="' + REG.seuilBloque + '" style="width:62px;min-height:30px;padding:3px 8px" onchange="REG.seuilBloque=Math.max(1,+this.value||10);sauverReglages();rendre()"> j · sans action ≥ <input class="champ num" type="number" min="1" max="90" value="' + REG.seuilDormant + '" style="width:62px;min-height:30px;padding:3px 8px" onchange="REG.seuilDormant=Math.max(1,+this.value||7);sauverReglages();rendre()"> j</span>' +
     '<button class="btn sm" onclick="exporterPilot()">⬇ Export CSV</button></div>';
-  h += L.length ? '<div class="tbl-wrap"><table><thead><tr><th>Dossier</th><th>Atelier</th><th>Famille</th><th>Marque</th><th>Modèle</th><th>Statut</th><th class="r">Âge</th><th class="r">Au statut</th><th>Date promise</th><th class="r">Pièces</th>' + (SEG_PILOT === 'dormants' ? '<th>Dernier événement</th>' : '') + '<th>Intervenant</th><th>Magasin</th></tr></thead><tbody>' +
+  h += L.length ? '<div class="tbl-wrap"><table><thead><tr><th>Dossier</th><th>Atelier</th><th>Famille</th><th>Marque</th><th>Modèle</th><th>Statut</th><th class="r">Âge</th><th class="r">Au statut</th><th>Date promise</th><th class="r">Pièces</th>' + (SEG_PILOT === 'dormants' ? '<th>Dernier événement</th>' : '') + (SEG_PILOT === 'devis' ? '<th>Devis émis</th>' : '') + '<th>Intervenant</th><th>Magasin</th></tr></thead><tbody>' +
     L.slice(0, 400).map(r => '<tr onclick="ouvrirFiche(\'dos\',\'' + echap(r.dos) + '\')"><td class="mono">' + echap(r.dos) + cp(r.dos) + '</td><td>' + echap(r.atl) + '</td><td>' + echap(r.fam) + '</td><td>' + echap(r.mq) + '</td><td>' + echap(r.mod || '') + '</td><td>' + echap(r.st) + '</td>' +
       '<td class="r num">' + (r.age >= 30 ? '<span class="pill p-err">' + r.age + ' j</span>' : r.age >= 23 ? '<span class="pill p-warn">' + r.age + ' j</span>' : fmtJ(r.age)) + '</td><td class="r num">' + fmtJ(r.ageSt) + '</td>' +
       '<td>' + (r.dDispo ? dateFR(r.dDispo) + (r.nowDispo != null ? ' <span class="pill ' + (r.nowDispo < 0 ? 'p-err' : r.nowDispo <= 3 ? 'p-warn' : 'p-n') + '">' + (r.nowDispo < 0 ? r.nowDispo + ' j' : 'J-' + r.nowDispo) + '</span>' : '') : '—') + '</td>' +
       '<td class="r num">' + (r.dem ? (r.paff || 0) + '/' + r.dem + (r.dlDem != null && r.dem > (r.paff || 0) ? ' · ' + r.dlDem + ' j' : '') : '') + '</td>' +
       (SEG_PILOT === 'dormants' ? '<td>' + (r._derEv ? dateFR(r._derEv) : 'aucun depuis le ' + dateFR(D.evMin)) + ' <span class="pill p-n">' + r._dorm + ' j</span></td>' : '') +
+      (SEG_PILOT === 'devis' ? '<td>' + dateFR(r.dDv) + ' <span class="pill p-warn">' + r._dvJ + ' j</span></td>' : '') +
       '<td>' + echap(r._p ? nomPid(r._p) : '') + '</td><td>' + echap((r.ld || '').replace(/^MAG /, '')) + '</td></tr>').join('') + '</tbody></table></div>'
     : '<div class="carte vide">Aucun dossier dans cette liste 👍</div>';
   if(L.length > 400) h += '<div class="note" style="margin-top:6px">400 premiers affichés · l\'export CSV contient la liste complète.</div>';
@@ -2439,7 +2568,7 @@ function ameliorerSelects(){
   majSelects();
 }
 function majSelects(){
-  document.querySelectorAll('.sel').forEach(w => {
+  document.querySelectorAll('.sel[data-id]').forEach(w => {
     const s = w.querySelector('select'), o = s.options[s.selectedIndex];
     w.querySelector('.tx span').textContent = o ? o.textContent : '';
     w.classList.toggle('actif', !!s.value && s.id !== 'fPeriode');
@@ -2564,6 +2693,440 @@ function marquerImage(src){
 }
 
 /* ════════════════════════════════════════════════════════════════════
+   V1.3 — RÉGLAGES : objectifs, libellés, vues enregistrées
+════════════════════════════════════════════════════════════════════ */
+if(!REG.obj) REG.obj = { tar:75, dl:10, ret:3, eff:85, en30:8 };
+if(!REG.objAtl) REG.objAtl = {};
+if(!REG.libFam) REG.libFam = {};
+if(!REG.libEv) REG.libEv = {};
+if(REG.seuilDevis == null) REG.seuilDevis = 7;
+if(REG.tvSec == null) REG.tvSec = 30;
+const OBJ_DEF = [
+  { k:'tar', lib:'Taux de réparation (TAR)', u:'%', sens:1, min:0, max:100 },
+  { k:'dl',  lib:'Délai moyen de réparation', u:'j', sens:-1, min:0, max:60 },
+  { k:'ret', lib:'Retours sous 30 j', u:'%', sens:-1, min:0, max:30 },
+  { k:'eff', lib:'Efficience', u:'%', sens:1, min:0, max:150 },
+  { k:'en30', lib:'Encours de 30 j et + (part)', u:'%', sens:-1, min:0, max:100 }
+];
+function objectif(k, atl){ const a = atl && REG.objAtl[atl]; return a && a[k] != null && a[k] !== '' ? +a[k] : +REG.obj[k]; }
+/* Zones des jauges déduites des objectifs */
+function zonesObj(k, atl){
+  const o = objectif(k, atl);
+  if(k === 'tar') return [[0, Math.max(0, o - 10), 'err'], [Math.max(0, o - 10), o, 'warn'], [o, 100, 'ok']];
+  if(k === 'eff') return [[0, Math.max(0, o - 15), 'err'], [Math.max(0, o - 15), o, 'warn'], [o, 131, 'ok']];
+  if(k === 'ret') return [[0, o, 'ok'], [o, Math.min(20, o * 2), 'warn'], [Math.min(20, o * 2), 21, 'err']];
+  if(k === 'dl')  return [[0, o, 'ok'], [o, Math.min(40, o * 1.5), 'warn'], [Math.min(40, o * 1.5), 41, 'err']];
+  return null;
+}
+function atteint(k, v, atl){ if(v == null || isNaN(v)) return null; const d = OBJ_DEF.find(x => x.k === k), o = objectif(k, atl); return d.sens > 0 ? v >= o : v <= o; }
+function badgeObj(k, v, atl){
+  const a = atteint(k, v, atl); if(a == null) return '';
+  const d = OBJ_DEF.find(x => x.k === k);
+  return '<span class="pill ' + (a ? 'p-ok' : 'p-err') + '" title="Objectif ' + d.lib.toLowerCase() + ' : ' + (d.sens > 0 ? '≥ ' : '≤ ') + objectif(k, atl) + ' ' + d.u + '">' + (a ? '✓' : '✗') + ' obj. ' + objectif(k, atl) + ' ' + d.u + '</span>';
+}
+function libFam(c){ return c && REG.libFam[c] ? REG.libFam[c] : ''; }
+function famTxt(c){ const l = libFam(c); return l ? c + ' · ' + l : c; }
+function libEv(c){ return c && REG.libEv[c] ? c + ' · ' + REG.libEv[c] : c; }
+function texteVersDico(t){ const o = {}; String(t || '').split(/\r?\n/).forEach(l => { const m = l.match(/^\s*([^=;:\t]+?)\s*[=;:\t]\s*(.+?)\s*$/); if(m) o[normTxt(m[1])] = m[2]; }); return o; }
+function dicoVersTexte(o){ return Object.keys(o).sort().map(k => k + ' = ' + o[k]).join('\n'); }
+
+/* ════════════════════════════════════════════════════════════════════
+   COMPLÉMENTS DU TABLEAU DE BORD : tendances 12 semaines
+════════════════════════════════════════════════════════════════════ */
+let TEND = 'n';
+function semCle(d){ const x = new Date(d + 'T12:00:00'); const j = (x.getDay() + 6) % 7; x.setDate(x.getDate() - j + 3); const a = new Date(x.getFullYear(), 0, 4);
+  return x.getFullYear() + '-S' + pad2(1 + Math.round(((x - a) / 864e5 - 3 + ((a.getDay() + 6) % 7)) / 7)); }
+function tendances(){
+  const so = filtrer(BASE.recs, { src:'SORTIE', bornes:{ a:'', b:'' } }), pil = filtrer(BASE.recs, { src:'PILOT', bornes:{ a:'', b:'' } });
+  const sem = new Map();
+  so.forEach(r => { const s = semCle(r.d); if(!sem.has(s)) sem.set(s, { so:[], pil:[] }); sem.get(s).so.push(r); });
+  pil.forEach(r => { const s = semCle(r.d); if(sem.has(s)) sem.get(s).pil.push(r); });
+  const cles = [...sem.keys()].sort().slice(-12);
+  return cles.map(s => { const x = sem.get(s), n = somme(x.so), tar = somme(x.so.filter(r => r.cop === 'TAR'));
+    const E = efficience(x.so, x.pil);
+    return { s, n, tar: n ? tar / n * 100 : null, dl: moyDl(x.so), ret: E && E.tar ? E.tauxRet : null, eff: E ? E.eff : null }; });
+}
+function carteTendances(){
+  const T = tendances(); if(T.length < 2) return '';
+  const M = { n:'Terminés', tar:'Réparés %', dl:'Délai moyen', ret:'Retours 30 j', eff:'Efficience' };
+  return '<div class="carte" style="margin-top:14px" id="carteTend"><div class="carte-t" style="flex-wrap:wrap"><div><h3>📈 Tendances des ' + T.length + ' dernières semaines</h3><div class="sous">Toutes les données chargées, filtres site / atelier appliqués · ligne pointillée = objectif</div></div>' +
+    '<div class="seg">' + Object.keys(M).map(k => '<button class="' + (TEND === k ? 'on' : '') + '" onclick="TEND=\'' + k + '\';dessinerTendances()">' + M[k] + '</button>').join('') + '</div></div>' +
+    '<div class="chart-box"><canvas id="cTend"></canvas></div>' +
+    (T.length < 6 ? '<div class="note">Ajoutez des flux de sortie plus anciens (un par mois par exemple) dans le dossier OneDrive pour allonger l\'historique.</div>' : '') + '</div>';
+}
+function dessinerTendances(){
+  const T = tendances(); if(!$('cTend')) return;
+  document.querySelectorAll('#carteTend .seg button').forEach(b => b.classList.toggle('on', b.getAttribute('onclick').indexOf("'" + TEND + "'") > 0));
+  const vals = T.map(x => x[TEND] == null ? null : Math.round(x[TEND] * 10) / 10);
+  const o = baseOpts(); o.plugins.legend.display = TEND !== 'n'; o.plugins.legend.position = 'bottom'; o.interaction = { mode:'index', intersect:false };
+  const u = TEND === 'dl' ? ' j' : TEND === 'n' ? '' : ' %';
+  o.plugins.tooltip.callbacks = { label: c => ' ' + c.dataset.label + ' : ' + (c.raw == null ? '—' : c.raw.toLocaleString('fr-FR') + u) };
+  const ds = [{ type: TEND === 'n' ? 'bar' : 'line', label: TEND === 'n' ? 'Terminés' : 'Valeur', data:vals, borderColor:css('--s1'), backgroundColor: TEND === 'n' ? css('--s1') : css('--s1'),
+    borderWidth:2, pointRadius:4, pointHoverRadius:6, tension:.25, borderRadius:4, maxBarThickness:34, spanGaps:true }];
+  if(TEND !== 'n' && REG.obj[TEND] != null) ds.push({ type:'line', label:'Objectif', data:T.map(() => objectif(TEND)), borderColor:css('--ok'), borderDash:[6, 5], borderWidth:2, pointRadius:0, fill:false });
+  graphique('cTend', { type: TEND === 'n' ? 'bar' : 'line', data:{ labels:T.map(x => x.s.replace(/^\d{4}-/, '')), datasets:ds }, options:o });
+}
+function ajoutBord(){
+  const el = $('v-bord'); if(!el || !BASE.recs.some(r => r.src === 'SORTIE')) return;
+  const n = [...el.querySelectorAll('.note')].find(x => /Évolutions comparées/.test(x.textContent)) || el.querySelector('.grid.g-kpi');
+  if(n && !$('carteTend')){ n.insertAdjacentHTML('afterend', carteTendances()); dessinerTendances(); }
+  const t = el.querySelector('.sec-t');
+  if(t && !$('btnRapport')) el.insertAdjacentHTML('afterbegin', '<div class="rangee" style="justify-content:flex-end;margin-bottom:10px"><button class="btn sm" id="btnRapport" onclick="rapportPeriode()">📄 Rapport de la période (PDF)</button></div>');
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   QUALITÉ : coût / valeur, garanties, demandé → réalisé, pièces
+════════════════════════════════════════════════════════════════════ */
+function ajoutQualite(){
+  const el = $('v-qual'); if(!el) return;
+  const so = filtrer(BASE.recs, { src:'SORTIE' }).filter(r => !r.snap), tj = filtrer(BASE.recs, { src:'TERMJ1' }).filter(r => !r.snap);
+  if(!so.length && !tj.length) return;
+  let h = '<div class="sec-t"><h2>Coûts, garanties et prises en charge</h2><span>Aide à la décision réparer / remplacer et retour qualité aux magasins</span></div><div class="grid g-2">';
+  // Devis selon la valeur de l'appareil
+  const dv = so.filter(r => r.dv && r.mtDv && r.prix && (r.rd === 'ACCEPTE' || r.rd === 'REFUSE'));
+  if(dv.length >= 10){
+    const T = [[0, 25, 'moins de 25 %'], [25, 50, '25 à 50 %'], [50, 75, '50 à 75 %'], [75, 100, '75 à 100 %'], [100, 1e9, 'plus que le prix d\'achat']];
+    const lignes = T.map(([a, b, l]) => { const x = dv.filter(r => { const q = r.mtDv / r.prix * 100; return q >= a && q < b; }); return [l, x.length ? somme(x.filter(r => r.rd === 'ACCEPTE')) / somme(x) * 100 : 0, '· ' + x.length + ' devis']; }).filter(x => !/· 0 devis/.test(x[2]));
+    const moyQ = dv.reduce((s, r) => s + r.mtDv / r.prix * 100, 0) / dv.length;
+    h += '<div class="carte"><h3>💶 Acceptation du devis selon la valeur de l\'appareil</h3><div class="sous">Montant du devis rapporté au prix d\'achat · ' + dv.length + ' devis avec réponse · devis moyen = ' + Math.round(moyQ) + ' % du prix</div>' +
+      rangHTML(lignes, { fmt:v => fmtP(v, 0) + ' acceptés', coul:'--s3', max:6 }) +
+      '<div class="note" style="margin-top:8px">Repère pour le RCD : au-delà du seuil où l\'acceptation chute, proposer d\'emblée une solution de remplacement.</div></div>';
+  }
+  // Garanties détaillées
+  const gar = so.filter(r => r.gar);
+  if(gar.length){
+    const G = compter(gar, 'gar').slice(0, 10).map(([g, n]) => { const x = gar.filter(r => r.gar === g); return { g, n, tar: somme(x.filter(r => r.cop === 'TAR')) / n * 100, dl: moyDl(x) }; });
+    h += '<div class="carte"><h3>🛡 Régimes de garantie détaillés</h3><div class="sous">Volume, part réparée et délai par code de garantie</div><div class="tbl-wrap" style="max-height:340px"><table><thead><tr><th>Code</th><th class="r">Terminés</th><th class="r">Réparés</th><th class="r">Délai moy.</th></tr></thead><tbody>' +
+      G.map(x => '<tr style="cursor:default"><td><b>' + echap(x.g) + '</b> <span class="note">' + (/^S/.test(x.g) ? 'sous garantie' : /^H/.test(x.g) ? 'hors garantie' : '') + '</span></td><td class="r num">' + fmtN(x.n) + '</td><td class="r">' + pillP(x.tar) + '</td><td class="r num">' + fmtJ(x.dl) + '</td></tr>').join('') + '</tbody></table></div></div>';
+  }
+  // Demandé → réalisé
+  const dr = tj.filter(r => r.tid && r.tir);
+  if(dr.length){
+    const tot = somme(dr);
+    h += '<div class="carte"><h3>🔀 Intervention demandée → réalisée</h3><div class="sous">Terminées J-1 · écart entre la demande au dépôt et ce qui a été fait</div>' +
+      rangHTML(compter(dr, r => r.tid + ' → ' + r.tir).map(([k, n]) => [k, n, '· ' + Math.round(n / tot * 100) + ' %']), { coul:'--s7', max:10 }) + '</div>';
+  }
+  // Pièce consommée
+  const cs = tj.filter(r => r.conso != null);
+  if(cs.length){
+    const parAtl = compter(cs, 'atl').filter(x => x[1] >= 5).map(([a, n]) => [a, somme(cs.filter(r => r.atl === a && r.conso)) / n * 100, '· ' + n + ' inter.']).sort((a, b) => b[1] - a[1]);
+    h += '<div class="carte"><h3>🔩 Interventions avec pièce consommée</h3><div class="sous">' + fmtP(somme(cs.filter(r => r.conso)) / somme(cs) * 100, 1) + ' des interventions terminées J-1 · par atelier</div>' +
+      rangHTML(parAtl, { fmt:v => fmtP(v, 0), coul:'--s4', max:10 }) + '</div>';
+  }
+  h += '</div>';
+  el.insertAdjacentHTML('beforeend', h);
+  outilsCartes();
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   FLUX : codes événement et temps entre étapes
+════════════════════════════════════════════════════════════════════ */
+function ajoutFlux(){
+  const el = $('v-flux'); if(!el) return;
+  const ev = filtrer(BASE.recs, { src:'EVT' }).filter(r => !r.snap && r.ev);
+  if(!ev.length) return;
+  const parDos = new Map();
+  ev.forEach(r => { if(!r.dos) return; if(!parDos.has(r.dos)) parDos.set(r.dos, []); parDos.get(r.dos).push(r); });
+  const tr = new Map();
+  parDos.forEach(L => {
+    L.sort((a, b) => (a.d + (a.hr || '')).localeCompare(b.d + (b.hr || '')));
+    for(let i = 1; i < L.length; i++){
+      if(L[i].ev === L[i - 1].ev) continue;
+      const k = L[i - 1].ev + ' → ' + L[i].ev, j = joursEntre(L[i - 1].d, L[i].d);
+      let x = tr.get(k); if(!x){ x = { k, n:0, s:0 }; tr.set(k, x); } x.n++; x.s += Math.max(0, j || 0);
+    }
+  });
+  const T = [...tr.values()].filter(x => x.n >= 10).sort((a, b) => b.n - a.n).slice(0, 14);
+  const lents = [...tr.values()].filter(x => x.n >= 10).map(x => Object.assign({}, x, { m:x.s / x.n })).sort((a, b) => b.m - a.m).slice(0, 10);
+  const h = '<div class="sec-t"><h2>Parcours des dossiers</h2><span>À partir des événements saisis · ' + fmtN(parDos.size) + ' dossiers · libellés des codes modifiables dans Sources &amp; OneDrive</span></div><div class="grid g-3">' +
+    '<div class="carte"><h3>🧾 Codes événement les plus saisis</h3><div class="sous">Sur la période</div>' + rangHTML(compter(ev, 'ev'), { lib:libEv, coul:'--s1', max:12 }) + '</div>' +
+    '<div class="carte"><h3>➡️ Enchaînements les plus fréquents</h3><div class="sous">Événement suivi du suivant, avec le délai moyen entre les deux</div>' +
+      rangHTML(T.map(x => [x.k, x.n, '· ' + fmtJ(x.s / x.n)]), { lib:k => k.split(' → ').map(libEv).join(' → '), coul:'--s3', max:14 }) + '</div>' +
+    '<div class="carte"><h3>🐢 Étapes les plus longues</h3><div class="sous">Délai moyen entre deux événements (au moins 10 cas)</div>' +
+      rangHTML(lents.map(x => [x.k, x.m, '· ' + x.n + ' cas']), { lib:k => k.split(' → ').map(libEv).join(' → '), fmt:fmtJ, coul:'--s2', max:10 }) + '</div></div>';
+  el.insertAdjacentHTML('beforeend', h);
+  outilsCartes();
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   MAGASINS : origine géographique (département, jamais l'adresse)
+════════════════════════════════════════════════════════════════════ */
+const DEPTS = ('01Ain|02Aisne|03Allier|04Alpes-de-Haute-Provence|05Hautes-Alpes|06Alpes-Maritimes|07Ardèche|08Ardennes|09Ariège|10Aube|11Aude|12Aveyron|13Bouches-du-Rhône|14Calvados|15Cantal|16Charente|17Charente-Maritime|18Cher|19Corrèze|2ACorse-du-Sud|2BHaute-Corse|21Côte-d\'Or|22Côtes-d\'Armor|23Creuse|24Dordogne|25Doubs|26Drôme|27Eure|28Eure-et-Loir|29Finistère|30Gard|31Haute-Garonne|32Gers|33Gironde|34Hérault|35Ille-et-Vilaine|36Indre|37Indre-et-Loire|38Isère|39Jura|40Landes|41Loir-et-Cher|42Loire|43Haute-Loire|44Loire-Atlantique|45Loiret|46Lot|47Lot-et-Garonne|48Lozère|49Maine-et-Loire|50Manche|51Marne|52Haute-Marne|53Mayenne|54Meurthe-et-Moselle|55Meuse|56Morbihan|57Moselle|58Nièvre|59Nord|60Oise|61Orne|62Pas-de-Calais|63Puy-de-Dôme|64Pyrénées-Atlantiques|65Hautes-Pyrénées|66Pyrénées-Orientales|67Bas-Rhin|68Haut-Rhin|69Rhône|70Haute-Saône|71Saône-et-Loire|72Sarthe|73Savoie|74Haute-Savoie|75Paris|76Seine-Maritime|77Seine-et-Marne|78Yvelines|79Deux-Sèvres|80Somme|81Tarn|82Tarn-et-Garonne|83Var|84Vaucluse|85Vendée|86Vienne|87Haute-Vienne|88Vosges|89Yonne|90Territoire de Belfort|91Essonne|92Hauts-de-Seine|93Seine-Saint-Denis|94Val-de-Marne|95Val-d\'Oise|971Guadeloupe|972Martinique|973Guyane|974La Réunion|976Mayotte')
+  .split('|').reduce((o, s) => { const m = s.match(/^(\d[\dAB]\d?|2[AB])(.+)$/); if(m) o[m[1]] = m[2]; return o; }, {});
+function ajoutMag(){
+  const el = $('v-mag'); if(!el) return;
+  const so = filtrer(BASE.recs, { src:'SORTIE' }).filter(r => !r.snap && r.dep);
+  if(so.length < 10) return;
+  const tot = somme(so);
+  const D = compter(so, 'dep').map(([d, n]) => { const x = so.filter(r => r.dep === d && r.dlTot != null); return [d, n, '· ' + Math.round(n / tot * 100) + ' %' + (x.length ? ' · ' + fmtJ(x.reduce((s, r) => s + r.dlTot, 0) / x.length) : '')]; });
+  const h = '<div class="sec-t"><h2>Origine géographique des clients</h2><span>Par département (code postal réduit aux 2 premiers chiffres, aucune adresse n\'est conservée)</span></div><div class="grid g-2">' +
+    '<div class="carte"><h3>🗺 Départements d\'origine</h3><div class="sous">Appareils terminés · part · délai client moyen</div>' + rangHTML(D, { lib:d => d + ' — ' + (DEPTS[d] || 'autre'), coul:'--s1', max:12 }) + '</div>' +
+    '<div class="carte"><h3>Répartition</h3><div class="chart-box"><canvas id="mDep"></canvas></div></div></div>';
+  el.insertAdjacentHTML('beforeend', h);
+  anneau('mDep', D.map(x => [x[0] + ' ' + (DEPTS[x[0]] || ''), x[1]]));
+  outilsCartes();
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   PIÈCES CONSOMMÉES : HIT-PARADE
+════════════════════════════════════════════════════════════════════ */
+let TRI_PCS = { k:'qte', sens:-1 };
+function statsPieces(L){
+  const m = new Map();
+  L.forEach(r => { let x = m.get(r.ref); if(!x){ x = { ref:r.ref, lib:r.lib, qte:0, cout:0, dos:new Set(), fam:new Map(), mq:new Map(), atl:new Map() }; m.set(r.ref, x); }
+    const q = r.qte || 0; x.qte += q; x.cout += r.cout || 0; if(r.dos) x.dos.add(r.dos);
+    if(r.fam) x.fam.set(r.fam, (x.fam.get(r.fam) || 0) + q); if(r.mq) x.mq.set(r.mq, (x.mq.get(r.mq) || 0) + q); if(r.atl) x.atl.set(r.atl, (x.atl.get(r.atl) || 0) + q);
+    if(r.lib && r.lib !== r.ref) x.lib = r.lib; });
+  const top = M => [...M.entries()].sort((a, b) => b[1] - a[1])[0];
+  return [...m.values()].map(x => Object.assign(x, { nDos:x.dos.size, famP:(top(x.fam) || [''])[0], mqP:(top(x.mq) || [''])[0], atlP:(top(x.atl) || [''])[0] }));
+}
+function rendrePieces(){
+  const el = $('v-pieces'); if(!el) return;
+  const tous = BASE.recs.filter(r => r.src === 'PIECES');
+  if(!tous.length){
+    el.innerHTML = '<div class="carte"><h3>🔩 Hit-parade des pièces consommées</h3><div class="sous">En attente du fichier des pièces consommées</div>' +
+      '<p>Déposez l\'export des pièces dans le dossier OneDrive des exports : il sera reconnu automatiquement et cet écran affichera le classement des références, leur coût, les tendances et les pièces changées sur des appareils revenus.</p>' +
+      '<div class="tbl-wrap" style="max-height:none"><table><thead><tr><th>Information</th><th>Noms de colonnes reconnus</th><th></th></tr></thead><tbody>' +
+      [['Référence pièce', COLS_PIECES.ref, 'obligatoire'], ['Quantité', COLS_PIECES.qte, 'obligatoire'], ['Désignation', COLS_PIECES.lib, 'conseillé'], ['N° de dossier / inter', ['NUM DOS NOMAD','NUM INTER NOMAD','DOSSIER'], 'conseillé'],
+       ['Date', COLS_PIECES.date, 'conseillé'], ['Prix unitaire ou montant', COLS_PIECES.pu.concat(COLS_PIECES.tot), 'facultatif'], ['Technicien', COLS_PIECES.qui, 'facultatif'], ['Atelier, famille, marque, modèle, CODIC', ['CODE ATELIER','FAMILLE','MARQUE','MODELE','APPAREIL CODIC'], 'facultatif']]
+        .map(([a, c, o]) => '<tr style="cursor:default"><td><b>' + a + '</b></td><td class="note" style="white-space:normal">' + c.slice(0, 7).join(' · ') + '</td><td><span class="pill ' + (o === 'obligatoire' ? 'p-err' : o === 'conseillé' ? 'p-warn' : 'p-n') + '">' + o + '</span></td></tr>').join('') +
+      '</tbody></table></div><div class="note" style="margin-top:8px">Avec le n° de dossier, l\'outil retrouve seul l\'atelier, la famille, la marque et le technicien depuis le flux de sortie.</div></div>';
+    return;
+  }
+  // Compléter atelier / famille / marque / technicien depuis le flux de sortie quand la pièce n'en dit rien
+  const parDos = new Map(); BASE.recs.forEach(r => { if((r.src === 'SORTIE' || r.src === 'ENCOURS') && r.dos && !parDos.has(r.dos)) parDos.set(r.dos, r); });
+  tous.forEach(r => { if(r._enrichi) return; const s = parDos.get(r.dos); if(s){ ['atl','fam','mq','mod','site','codic'].forEach(k => { if(!r[k] && s[k]) r[k] = s[k]; }); if(!r._p && s._p) r._p = s._p; if(!r.d) r.d = s.d || ''; } r._enrichi = 1; });
+  let L = filtrer(BASE.recs, { src:'PIECES' }); if(CHIPS.ref) L = L.filter(r => r.ref === CHIPS.ref);
+  const bp = bornesPrec(), Lp = bp ? filtrer(BASE.recs, { src:'PIECES', bornes:bp }) : [];
+  const S = statsPieces(L), Sp = new Map(statsPieces(Lp).map(x => [x.ref, x.qte]));
+  const qT = S.reduce((s, x) => s + x.qte, 0), cT = S.reduce((s, x) => s + x.cout, 0), dosT = new Set(L.map(r => r.dos).filter(Boolean)).size;
+  const qP = Lp.reduce((s, r) => s + (r.qte || 0), 0);
+  // Part des réparations avec pièce
+  const tar = filtrer(BASE.recs, { src:'SORTIE' }).filter(r => r.cop === 'TAR' && r.dos && !r.snap), dosPcs = new Set(tous.map(r => r.dos));
+  const partPcs = tar.length ? tar.filter(r => dosPcs.has(r.dos)).length / tar.length * 100 : null;
+  // Conso hebdomadaire sur tout l'historique chargé
+  const ds = tous.map(r => r.d).filter(Boolean).sort(), nbSem = ds.length ? Math.max(1, (joursEntre(ds[0], ds[ds.length - 1]) + 1) / 7) : 1;
+  const hebdo = new Map(); tous.forEach(r => hebdo.set(r.ref, (hebdo.get(r.ref) || 0) + (r.qte || 0)));
+  // Pièces changées sur des appareils revenus sous 30 jours
+  const revenus = new Set(BASE.recs.filter(r => r.src === 'SORTIE' && r.ri30 > 0 && r.dos).map(r => r.dos));
+  const surRet = statsPieces(L.filter(r => revenus.has(r.dos))).sort((a, b) => b.nDos - a.nDos);
+  let h = '<div class="grid g-kpi">' +
+    kpi('Pièces consommées', fmtN(qT), S.length + ' référence(s) distincte(s)', '--s4', '', { ic:'🔩', evo: Lp.length ? evo(qT, qP, { neutre:true }) : '' }) +
+    kpi('Coût des pièces', cT ? Math.round(cT).toLocaleString('fr-FR') + ' €' : '—', dosT ? (cT ? Math.round(cT / dosT).toLocaleString('fr-FR') + ' € par dossier · ' : '') + fmtN(dosT) + ' dossiers' : '', '--s2', '', { ic:'💶' }) +
+    kpi('Pièces par dossier', dosT ? (qT / dosT).toLocaleString('fr-FR', { maximumFractionDigits:1 }) : '—', 'en moyenne', '--s7', '', { ic:'🧮' }) +
+    (partPcs != null ? kpi('Réparations avec pièce', fmtP(partPcs, 1), 'part des TAR ayant consommé une pièce', '--s3', '', { ic:'🛠' }) : '') +
+    (surRet.length ? kpi('Pièces sur appareils revenus', fmtN(surRet.reduce((s, x) => s + x.qte, 0)), surRet.length + ' référence(s) à surveiller', '--err', '', { ic:'🔁' }) : '') + '</div>';
+  if(CHIPS.ref){
+    const x = S[0];
+    h += '<div class="carte" style="margin-top:14px"><div class="carte-t"><div><h3>🔎 Référence ' + echap(CHIPS.ref) + cp(CHIPS.ref) + '</h3><div class="sous">' + echap(x ? x.lib : '') + ' · ' + fmtN(qT) + ' pièce(s) sur ' + fmtN(dosT) + ' dossier(s)</div></div><button class="btn sm" onclick="CHIPS.ref=\'\';rendre()">✕ Toutes les pièces</button></div>' +
+      '<div class="tbl-wrap" style="max-height:420px"><table><thead><tr><th>Dossier</th><th>Date</th><th>Atelier</th><th>Famille</th><th>Marque</th><th>Modèle</th><th>Intervenant</th><th class="r">Qté</th><th>Revenu</th></tr></thead><tbody>' +
+      L.slice().sort((a, b) => (b.d || '').localeCompare(a.d || '')).slice(0, 300).map(r => '<tr onclick="' + (r.dos ? 'ouvrirFiche(\'dos\',\'' + echap(r.dos) + '\')' : '') + '"><td class="mono">' + echap(r.dos || '') + cp(r.dos) + '</td><td>' + (r.d ? dateFR(r.d) : '') + '</td><td>' + echap(r.atl || '') + '</td><td>' + echap(famTxt(r.fam || '')) + '</td><td>' + echap(r.mq || '') + '</td><td>' + echap(r.mod || '') + '</td><td>' + echap(r._p ? nomPid(r._p) : '') + '</td><td class="r num">' + fmtN(r.qte) + '</td><td>' + (revenus.has(r.dos) ? '<span class="pill p-err">revenu</span>' : '') + '</td></tr>').join('') + '</tbody></table></div></div>';
+  }
+  const k = TRI_PCS.k, sens = TRI_PCS.sens;
+  S.forEach(x => { x.evo = Sp.has(x.ref) ? x.qte - Sp.get(x.ref) : null; x.hebdo = (hebdo.get(x.ref) || 0) / nbSem; });
+  S.sort((a, b) => { const p = a[k], q = b[k]; if(typeof p === 'string') return sens * String(p).localeCompare(String(q), 'fr'); return sens * ((p == null ? -1e9 : p) - (q == null ? -1e9 : q)); });
+  const col = (id, lib, r) => '<th' + (r ? ' class="r"' : '') + ' onclick="TRI_PCS={k:\'' + id + '\',sens:TRI_PCS.k===\'' + id + '\'?-TRI_PCS.sens:' + (id === 'ref' || id === 'lib' ? 1 : -1) + '};rendre()">' + lib + (k === id ? (sens < 0 ? ' ↓' : ' ↑') : '') + '</th>';
+  if(!CHIPS.ref){
+    h += '<div class="grid g-21" style="margin-top:14px"><div class="carte"><h3>🏆 Top 15 des pièces</h3><div class="sous">Quantités consommées sur la période · cliquez une barre pour le détail</div><div class="chart-box h2"><canvas id="pTop"></canvas></div></div>' +
+      '<div class="carte"><h3>Par famille d\'appareil</h3><div class="sous">Quantités</div>' + treemapHTML(statsFam(L), 'fam') + '</div></div>';
+    h += '<div class="sec-t"><h2>Hit-parade des références</h2><span>' + S.length + ' référence(s) · évolution vs période précédente · conso hebdo sur tout l\'historique chargé (aide au stock)</span></div>' +
+      '<div class="tbl-wrap"><table><thead><tr><th class="r">#</th>' + col('ref', 'Référence') + col('lib', 'Désignation') + col('qte', 'Qté', 1) + col('evo', 'Évol.', 1) + col('nDos', 'Dossiers', 1) +
+      col('famP', 'Famille') + col('mqP', 'Marque') + col('cout', 'Coût', 1) + col('hebdo', 'Conso / sem.', 1) + '</tr></thead><tbody>' +
+      S.slice(0, 200).map((x, i) => '<tr onclick="memoriser();CHIPS.ref=\'' + echap(x.ref).replace(/'/g, "\\'") + '\';rendre()"><td class="r num muted">' + (i + 1) + '</td><td class="mono">' + echap(x.ref) + cp(x.ref) + '</td><td style="white-space:normal;min-width:180px">' + echap(x.lib) + '</td>' +
+        '<td class="r num"><b>' + fmtN(x.qte) + '</b></td><td class="r">' + (x.evo == null ? '<span class="pill p-n">nouveau</span>' : x.evo ? '<span class="evo ' + (x.evo > 0 ? 'down' : 'up') + '">' + (x.evo > 0 ? '▲ +' : '▼ ') + fmtN(x.evo) + '</span>' : '<span class="evo eq">=</span>') + '</td>' +
+        '<td class="r num">' + fmtN(x.nDos) + '</td><td>' + echap(famTxt(x.famP)) + '</td><td>' + echap(x.mqP) + '</td><td class="r num">' + (x.cout ? Math.round(x.cout).toLocaleString('fr-FR') + ' €' : '') + '</td><td class="r num">' + x.hebdo.toLocaleString('fr-FR', { maximumFractionDigits:1 }) + '</td></tr>').join('') + '</tbody></table></div>';
+    h += '<div class="grid g-2" style="margin-top:14px"><div class="carte"><h3>🔁 Pièces changées sur des appareils revenus sous 30 jours</h3><div class="sous">Pièces posées lors d\'une réparation qui est revenue · à signaler au fournisseur si une référence se répète</div>' +
+      rangHTML(surRet.map(x => [x.ref, x.nDos, '· ' + x.lib.slice(0, 40)]), { coul:'--err', max:10, fmt:v => fmtN(v) + ' dos.' }) + '</div>' +
+      '<div class="carte"><h3>🏷 Par marque</h3><div class="sous">Quantités consommées</div>' + rangHTML(statsMq(L), { coul:'--s7', max:10 }) + '</div></div>';
+  }
+  el.innerHTML = h;
+  if(!CHIPS.ref){
+    const T = S.slice().sort((a, b) => b.qte - a.qte).slice(0, 15);
+    barresH('pTop', T.map(x => [x.ref + ' · ' + x.lib.slice(0, 28), x.qte]), null, css('--s4'), 15);
+    if(CHARTS.pTop) CHARTS.pTop.options.onClick = (e, els) => { if(els.length){ memoriser(); CHIPS.ref = T[els[0].index].ref; rendre(); } };
+  }
+}
+function statsFam(L){ const m = new Map(); L.forEach(r => { const k = r.fam || 'non renseignée'; m.set(k, (m.get(k) || 0) + (r.qte || 0)); }); return [...m.entries()].sort((a, b) => b[1] - a[1]); }
+function statsMq(L){ const m = new Map(); L.forEach(r => { if(!r.mq) return; m.set(r.mq, (m.get(r.mq) || 0) + (r.qte || 0)); }); return [...m.entries()].sort((a, b) => b[1] - a[1]); }
+
+/* ════════════════════════════════════════════════════════════════════
+   EXPORT EXCEL D'UN TABLEAU
+════════════════════════════════════════════════════════════════════ */
+const ICO_XLS = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 9h17M3.5 14.5h17M9 9v11.5"/></svg>';
+function exporterXLSX(table, nom){
+  if(typeof XLSX === 'undefined'){ toast('Module Excel indisponible', 'err'); return; }
+  const t = table.cloneNode(true); t.querySelectorAll('.cp,.outils,button').forEach(x => x.remove());
+  t.querySelectorAll('th').forEach(th => th.textContent = th.textContent.replace(/[↓↑]/g, '').trim());
+  t.querySelectorAll('td').forEach(td => { const s = td.textContent.replace(/\u202f|\u00a0/g, ' ').trim(); const m = s.match(/^(-?[\d ]+(?:,\d+)?)\s*(%|j|€)?$/); if(m){ td.setAttribute('data-v', m[1].replace(/ /g, '').replace(',', '.')); td.setAttribute('data-t', 'n'); } });
+  const wb = XLSX.utils.table_to_book(t, { sheet:'PilotPerf', raw:false });
+  const n = 'PilotPerf_' + (nom || 'tableau').replace(/[^\p{L}\p{N}]+/gu, '_').slice(0, 40) + '_' + dstr(new Date()) + '.xlsx';
+  XLSX.writeFile(wb, n); toast('✓ ' + n + ' enregistré', 'ok');
+}
+const _outilsV12 = outilsCartes;
+outilsCartes = function(){
+  _outilsV12();
+  document.querySelectorAll('.vue.on .carte > .outils').forEach(o => {
+    const c = o.parentNode, t = c.querySelector('table');
+    if(t && !o.querySelector('.xls')){ const b = document.createElement('button'); b.type = 'button'; b.className = 'xls'; b.title = 'Exporter ce tableau vers Excel'; b.innerHTML = ICO_XLS;
+      b.onclick = e => { e.stopPropagation(); exporterXLSX(t, titreElement(c)); }; o.appendChild(b); }
+  });
+  // Tableaux hors carte : petite barre d'outils au-dessus
+  document.querySelectorAll('.vue.on .tbl-wrap').forEach(w => {
+    if(w.closest('.carte') || (w.previousElementSibling && w.previousElementSibling.classList.contains('barre-tbl'))) return;
+    const t = w.querySelector('table'); if(!t) return;
+    const d = document.createElement('div'); d.className = 'barre-tbl';
+    const sec = (() => { let p = w.previousElementSibling; while(p && !p.classList.contains('sec-t')) p = p.previousElementSibling; return p ? p.querySelector('h2').textContent : $('titrePage').textContent; })();
+    d.innerHTML = '<button type="button" class="btn sm" title="Exporter ce tableau vers Excel">' + ICO_XLS + ' Excel</button><button type="button" class="btn sm" title="Imprimer ce tableau">' + ICO.impr + ' Imprimer</button>';
+    d.children[0].onclick = () => exporterXLSX(t, sec);
+    d.children[1].onclick = () => { const k = document.createElement('div'); k.className = 'carte'; k.innerHTML = '<h3>' + echap(sec) + '</h3>'; k.appendChild(w.cloneNode(true)); document.body.appendChild(k); k.style.display = 'none'; imprimerElement(k); setTimeout(() => k.remove(), 1500); };
+    w.parentNode.insertBefore(d, w);
+  });
+};
+
+/* ════════════════════════════════════════════════════════════════════
+   VUES ENREGISTRÉES
+════════════════════════════════════════════════════════════════════ */
+const K_VUES = 'pilotperf_vues';
+function lireVues(){ try{ return JSON.parse(localStorage.getItem(K_VUES) || '[]'); }catch(e){ return []; } }
+function ecrireVues(v){ try{ localStorage.setItem(K_VUES, JSON.stringify(v)); }catch(e){} }
+function etatCourant(){ return { vue:VUE === 'fiche' ? 'bord' : VUE, chips:Object.assign({}, CHIPS), site:$('fSite').value, atl:$('fAtelier').value, per:$('fPeriode').value, du:$('fDu').value, au:$('fAu').value }; }
+function libEtatCourant(){
+  const e = etatCourant(), p = [];
+  p.push(TITRES[e.vue] || e.vue); if(e.atl) p.push(e.atl);
+  p.push(($('fPeriode').options[$('fPeriode').selectedIndex] || {}).textContent || '');
+  Object.keys(e.chips).forEach(k => { if(e.chips[k] && LIB_CHIP[k]) p.push(LIB_CHIP[k](e.chips[k])); });
+  return p.filter(Boolean).join(' · ');
+}
+function basculerVues(e){
+  if(e) e.stopPropagation();
+  const w = $('menuVues'); if(w.classList.contains('ouvert')){ w.classList.remove('ouvert'); return; }
+  fermerSel(); remplirVues(); w.classList.add('ouvert');
+  setTimeout(() => { const i = $('nomVue'); if(i) i.focus(); }, 30);
+}
+function remplirVues(){
+  const V = lireVues(), m = $('menuVues').querySelector('.sel-menu');
+  m.innerHTML = '<div class="sg-t" style="padding:6px 10px 4px">Vues enregistrées</div>' +
+    (V.length ? V.map((v, i) => '<div class="op" onclick="appliquerVue(' + i + ')" title="' + echap(v.desc || '') + '"><span class="ck">★</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">' + echap(v.nom) + '<div class="note" style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + echap(v.desc || '') + '</div></span><button type="button" class="cp" style="opacity:1" title="Supprimer" onclick="event.stopPropagation();supprimerVue(' + i + ')">✕</button></div>').join('')
+      : '<div class="note" style="padding:4px 12px 8px">Aucune vue. Réglez écran, filtres et recherche puis enregistrez-les ici.</div>') +
+    '<div class="sep"></div><div style="padding:4px 6px"><div class="note" style="margin-bottom:4px">Vue actuelle : ' + echap(libEtatCourant()) + '</div>' +
+    '<input id="nomVue" placeholder="Nom de la vue (ex. Robots du mois)" onkeydown="if(event.key===\'Enter\')enregistrerVue()" onclick="event.stopPropagation()"><button type="button" class="btn sm pri" style="width:100%;justify-content:center" onclick="event.stopPropagation();enregistrerVue()">★ Enregistrer la vue actuelle</button></div>';
+}
+function enregistrerVue(){
+  const n = ($('nomVue').value || '').trim() || libEtatCourant().slice(0, 40);
+  const V = lireVues().filter(v => v.nom !== n); V.unshift(Object.assign({ nom:n, desc:libEtatCourant() }, etatCourant())); ecrireVues(V.slice(0, 20));
+  remplirVues(); toast('★ Vue « ' + n + ' » enregistrée', 'ok');
+}
+function supprimerVue(i){ const V = lireVues(); V.splice(i, 1); ecrireVues(V); remplirVues(); }
+function appliquerVue(i){
+  const v = lireVues()[i]; if(!v) return;
+  $('menuVues').classList.remove('ouvert'); memoriser();
+  const set = (id, val) => { const s = $(id); if([...s.options].some(o => o.value === val)) s.value = val; };
+  set('fSite', v.site); set('fAtelier', v.atl); set('fPeriode', v.per); $('fDu').value = v.du || ''; $('fAu').value = v.au || '';
+  $('fDu').style.display = $('fAu').style.display = v.per === 'perso' ? '' : 'none';
+  CHIPS = Object.assign({}, v.chips || {}); REG.site = $('fSite').value; sauverReglages();
+  aller(v.vue || 'bord', true); majSelects(); toast('★ ' + v.nom);
+}
+document.addEventListener('click', e => { const w = $('menuVues'); if(w && !e.target.closest('#menuVues')) w.classList.remove('ouvert'); });
+document.addEventListener('keydown', e => { const w = $('menuVues'); if(e.key === 'Escape' && w && w.classList.contains('ouvert')){ e.stopImmediatePropagation(); w.classList.remove('ouvert'); } }, true);
+
+/* ════════════════════════════════════════════════════════════════════
+   MODE ÉCRAN ATELIER (TV)
+════════════════════════════════════════════════════════════════════ */
+const TV = { on:false, i:0, t:null, vues:[] };
+function modeTV(){
+  if(TV.on) return quitterTV();
+  TV.vues = ['bord','pilot','flux','qual','mag','pieces'].filter(v => v === 'bord' || (v === 'pilot' && enDirect(['ENCOURS'])) || (v === 'flux' && enDirect(['SORTIE'])) ||
+    (v === 'qual' && BASE.recs.some(r => r.src === 'SORTIE' || r.src === 'TERMJ1')) || (v === 'mag' && enDirect(['SORTIE'])) || (v === 'pieces' && BASE.recs.some(r => r.src === 'PIECES')));
+  TV.on = true; TV.i = 0; TV.retour = VUE; document.body.classList.add('tv');
+  try{ document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); }catch(e){}
+  tvAfficher();
+}
+function tvAfficher(){
+  if(!TV.on) return;
+  const v = TV.vues[TV.i % TV.vues.length]; aller(v, true);
+  $('tvTitre').textContent = TITRES[v] + ' · ' + ($('fSite').value || 'tous sites') + ' · ' + (($('fPeriode').options[$('fPeriode').selectedIndex] || {}).textContent || '');
+  $('tvPos').textContent = (TV.i % TV.vues.length + 1) + ' / ' + TV.vues.length;
+  const b = $('tvBarre'); b.style.transition = 'none'; b.style.width = '0'; void b.offsetWidth; b.style.transition = 'width ' + REG.tvSec + 's linear'; b.style.width = '100%';
+  clearTimeout(TV.t); TV.t = setTimeout(() => { TV.i++; tvAfficher(); }, REG.tvSec * 1000);
+}
+function tvHorloge(){ const h = $('tvHeure'); if(h && TV.on) h.textContent = new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }); }
+setInterval(tvHorloge, 15000);
+function quitterTV(){
+  TV.on = false; clearTimeout(TV.t); document.body.classList.remove('tv');
+  try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+  aller(TV.retour || 'bord', true);
+}
+document.addEventListener('fullscreenchange', () => { if(!document.fullscreenElement && TV.on) quitterTV(); });
+document.addEventListener('keydown', e => { if(TV.on && e.key === 'Escape'){ e.stopImmediatePropagation(); quitterTV(); } if(TV.on && e.key === 'ArrowRight'){ TV.i++; tvAfficher(); } }, true);
+
+/* ════════════════════════════════════════════════════════════════════
+   RAPPORT DE LA PÉRIODE (une page à imprimer ou enregistrer en PDF)
+════════════════════════════════════════════════════════════════════ */
+function rapportPeriode(){
+  if(VUE !== 'bord') aller('bord', true);
+  setTimeout(() => {
+    const el = $('v-bord'), z = $('zoneImpr');
+    const L = filtrer(BASE.recs), K = indicateurs(L.filter(r => TYPES[r.src].date).concat(filtrer(BASE.recs, { sansPeriode:true, src:['ENCOURS','HD','P30'] })));
+    const so = K.so || [], E = so.length ? efficience(so, L.filter(r => r.src === 'PILOT')) : null;
+    let h = '<div class="entete"><div><b>Rapport de performance SAV</b><div>' + echap($('fSite').value || 'Tous sites') + (($('fAtelier').value) ? ' · atelier ' + echap($('fAtelier').value) : '') + ' · ' + echap(bornes().lib) + '</div></div><div>PilotPerf · édité le ' + new Date().toLocaleString('fr-FR', { dateStyle:'short', timeStyle:'short' }) + '</div></div>';
+    const kp = el.querySelector('.grid.g-kpi'); if(kp){ const k = kp.cloneNode(true); k.querySelectorAll('.spark').forEach(x => x.remove()); k.style.gridTemplateColumns = 'repeat(4,1fr)'; h += k.outerHTML; }
+    // Objectifs
+    const vals = { tar:K.tar, dl:K.dl, ret:E && E.tar ? E.tauxRet : null, eff:E ? E.eff : null, en30:K.nEn ? K.en30 / K.nEn * 100 : null };
+    h += '<div class="carte" style="margin-top:10px"><h3>🎯 Objectifs</h3><div class="rangee" style="gap:14px;margin-top:6px">' + OBJ_DEF.map(d => vals[d.k] == null ? '' : '<div><div class="note">' + d.lib + '</div><b class="num">' + (d.u === 'j' ? fmtJ(vals[d.k]) : fmtP(vals[d.k], 1)) + '</b> ' + badgeObj(d.k, vals[d.k]) + '</div>').join('') + '</div></div>';
+    // Alertes encours
+    if(enDirect(['ENCOURS'])){ const D = pilotageData(); h += '<div class="carte" style="margin-top:10px"><h3>🧭 Points d\'attention (encours)</h3><div class="rangee" style="gap:18px;margin-top:6px">' +
+      Object.keys(SEGS).map(k => '<div><div class="note">' + SEGS[k].ic + ' ' + SEGS[k].lib + '</div><b class="num" style="font-size:18px">' + fmtN(D[k].length) + '</b></div>').join('') + '</div></div>'; }
+    // Ateliers
+    const A = compter(so, 'atl').slice(0, 8).map(([a, n]) => { const x = so.filter(r => r.atl === a); const t = somme(x.filter(r => r.cop === 'TAR')) / n * 100, dl = moyDl(x);
+      return '<tr><td><b>' + echap(a) + '</b></td><td class="r num">' + fmtN(n) + '</td><td class="r">' + fmtP(t, 1) + ' ' + badgeObj('tar', t, a) + '</td><td class="r">' + fmtJ(dl) + ' ' + badgeObj('dl', dl, a) + '</td></tr>'; }).join('');
+    if(A) h += '<div class="carte" style="margin-top:10px"><h3>🏭 Ateliers</h3><table><thead><tr><th>Atelier</th><th class="r">Terminés</th><th class="r">Réparés</th><th class="r">Délai</th></tr></thead><tbody>' + A + '</tbody></table></div>';
+    // Graphiques : tendance + cascade
+    const im = id => { const c = $(id); try{ return c ? '<img class="graph" src="' + c.toDataURL('image/png') + '" style="width:100%;height:auto">' : ''; }catch(e){ return ''; } };
+    h += '<div class="grid" style="grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">' + ($('cTend') ? '<div class="carte"><h3>📈 Tendance 12 semaines</h3>' + im('cTend') + '</div>' : '') + ($('cCasc') ? '<div class="carte"><h3>Cascade des fins d\'intervention</h3>' + im('cCasc') + '</div>' : '') + '</div>';
+    const tj = L.filter(r => r.src === 'TERMJ1' && !r.snap);
+    const pan = tj.length ? compter(tj.filter(r => texteUtile(r.sym)), r => texteUtile(r.sym)).slice(0, 5) : [];
+    const mags = compter(so.filter(r => r.ld), r => r.ld.replace(/^MAG\s+/, '')).slice(0, 5);
+    const pcs = L.filter(r => r.src === 'PIECES'), pTop = pcs.length ? statsPieces(pcs).sort((a, b) => b.qte - a.qte).slice(0, 5) : [];
+    const liste = (t, P, f) => P.length ? '<div class="carte"><h3>' + t + '</h3><ol style="margin:6px 0 0;padding-left:18px">' + P.map(x => '<li>' + f(x) + '</li>').join('') + '</ol></div>' : '';
+    h += '<div class="grid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px">' + liste('🩺 Pannes les plus fréquentes', pan, x => echap(x[0]) + ' — <b>' + fmtN(x[1]) + '</b>') +
+      liste('🏬 Premiers magasins', mags, x => echap(x[0]) + ' — <b>' + fmtN(x[1]) + '</b>') + liste('🔩 Pièces les plus consommées', pTop, x => echap(x.ref) + ' ' + echap(x.lib.slice(0, 30)) + ' — <b>' + fmtN(x.qte) + '</b>') + '</div>';
+    z.innerHTML = h; document.body.classList.add('impr-un');
+    const fin = () => { document.body.classList.remove('impr-un'); z.innerHTML = ''; window.removeEventListener('afterprint', fin); };
+    window.addEventListener('afterprint', fin);
+    setTimeout(() => { window.print(); setTimeout(fin, 800); }, 120);
+  }, VUE === 'bord' ? 0 : 500);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   GUIDE
+════════════════════════════════════════════════════════════════════ */
+function ouvrirGuide(){ $('voileGuide').classList.add('on'); }
+function fermerGuide(){ $('voileGuide').classList.remove('on'); }
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('voileGuide') && $('voileGuide').classList.contains('on')){ e.stopImmediatePropagation(); fermerGuide(); } }, true);
+
+/* ════════════════════════════════════════════════════════════════════
+   RÉGLAGES (Sources & OneDrive) : objectifs, libellés, mode écran
+════════════════════════════════════════════════════════════════════ */
+function carteReglages(){
+  const adm = estAdmin(), dis = adm ? '' : ' disabled';
+  const atls = [...new Set(BASE.recs.filter(r => r.src === 'SORTIE' && r.atl).map(r => r.atl))].sort();
+  const inp = (val, on, w) => '<input class="champ num" type="number" step="0.5" style="width:' + (w || 76) + 'px;min-height:32px;padding:4px 10px" value="' + (val == null ? '' : val) + '"' + dis + ' onchange="' + on + '">';
+  return '<div class="sec-t"><h2>Objectifs, libellés et écran atelier</h2><span>' + (adm ? 'Modifiables (mode administrateur)' : '🔒 Lecture seule — <a href="#" onclick="exigerAdmin(()=>rendre());return false">déverrouiller pour modifier</a>') + '</span></div>' +
+    '<div class="grid g-2"><div class="carte"><h3>🎯 Objectifs</h3><div class="sous">Utilisés par les jauges, la tendance, les ateliers et le rapport · laisser vide un objectif d\'atelier = objectif du site</div>' +
+    '<div class="tbl-wrap" style="max-height:420px"><table><thead><tr><th>Indicateur</th><th class="r">Site</th>' + atls.map(a => '<th class="r">' + echap(a) + '</th>').join('') + '</tr></thead><tbody>' +
+    OBJ_DEF.map(d => '<tr style="cursor:default"><td>' + d.lib + ' <span class="note">(' + (d.sens > 0 ? '≥' : '≤') + ' ' + d.u + ')</span></td><td class="r">' + inp(REG.obj[d.k], "REG.obj['" + d.k + "']=+this.value;sauverReglages();toast('Objectif enregistré','ok')") + '</td>' +
+      atls.map(a => '<td class="r">' + inp((REG.objAtl[a] || {})[d.k], "(REG.objAtl['" + a + "']=REG.objAtl['" + a + "']||{})['" + d.k + "']=this.value===''?'':+this.value;sauverReglages()", 64) + '</td>').join('') + '</tr>').join('') +
+    '</tbody></table></div></div>' +
+    '<div class="carte"><h3>🏷 Libellés</h3><div class="sous">Une ligne par code : <code>CODE = libellé</code> · ils s\'affichent à côté des codes</div>' +
+    '<div class="rangee" style="align-items:flex-start;gap:12px"><label style="flex:1;min-width:220px"><div class="note">Familles (ex. ASPBA = Aspirateur balai)</div><textarea id="txtFam" rows="7" style="width:100%;border:1px solid var(--border);border-radius:12px;padding:8px 10px;background:var(--surface-2);font:13px/1.4 var(--mono,monospace)"' + dis + '>' + echap(dicoVersTexte(REG.libFam)) + '</textarea></label>' +
+    '<label style="flex:1;min-width:220px"><div class="note">Codes événement (ex. ATL/TAR = Fin réparation)</div><textarea id="txtEv" rows="7" style="width:100%;border:1px solid var(--border);border-radius:12px;padding:8px 10px;background:var(--surface-2);font:13px/1.4 var(--mono,monospace)"' + dis + '>' + echap(dicoVersTexte(REG.libEv)) + '</textarea></label></div>' +
+    '<div class="rangee" style="margin-top:8px"><button class="btn sm pri"' + dis + ' onclick="REG.libFam=texteVersDico($(\'txtFam\').value);REG.libEv=texteVersDico($(\'txtEv\').value);sauverReglages();toast(\'✓ Libellés enregistrés\',\'ok\');rendre()">Enregistrer les libellés</button>' +
+    '<span class="note">Astuce : copiez-collez deux colonnes depuis Excel (code, libellé), le séparateur tabulation est accepté.</span></div>' +
+    '<h3 style="margin-top:14px">📺 Mode écran atelier</h3><div class="rangee"><span class="note">Changer d\'écran toutes les</span>' + inp(REG.tvSec, "REG.tvSec=Math.max(10,+this.value||30);sauverReglages()", 70) + '<span class="note">secondes</span>' +
+    '<span class="note">· Seuil « devis sans réponse » :</span>' + inp(REG.seuilDevis, "REG.seuilDevis=Math.max(1,+this.value||7);sauverReglages()", 64) + '<span class="note">j</span></div></div></div>';
+}
+
+/* ════════════════════════════════════════════════════════════════════
    MOTEUR DE RECHERCHE INTELLIGENT
    - Comprend les mots-clés : semaine 46, novembre, hier, TAR/TAN, AIR,
      +30j, retours, sous-traitance, Fnac/Darty, une marque, une famille.
@@ -2587,6 +3150,10 @@ function construireIndex(){
   IDX.dos = [...dm.values()].map(e => ({ k:e.k, lib:e.lib, sub:e.sub, t:normTxt([...e.parts].join(' ')) }));
   const ens = (cle) => compter(BASE.recs, cle).map(([v, n]) => ({ k:v, lib:v, sub:fmtN(n) + ' ligne(s)', t:normTxt(v), n }));
   IDX.atl = ens('atl'); IDX.mq = ens('mq'); IDX.fam = ens('fam'); IDX.st = ens('st');
+  IDX.fam.forEach(e => { const l = typeof libFam === 'function' ? libFam(e.k) : ''; if(l){ e.lib = e.k + ' · ' + l; e.t = normTxt(e.k + ' ' + l); } });
+  IDX.ld = compter(BASE.recs.filter(r => r.ld && (r.src === 'SORTIE' || r.src === 'ENCOURS')), 'ld').map(([v, n]) => ({ k:v, lib:v.replace(/^MAG\s+/, ''), sub:fmtN(n) + ' dossier(s)', t:normTxt(v), n }));
+  const pm = new Map(); BASE.recs.forEach(r => { if(r.src !== 'PIECES') return; let x = pm.get(r.ref); if(!x){ x = { k:r.ref, lib:r.ref + ' — ' + (r.lib || ''), n:0 }; pm.set(r.ref, x); } x.n += r.qte || 0; });
+  IDX.ref = [...pm.values()].map(x => ({ k:x.k, lib:x.lib, sub:fmtN(x.n) + ' pièce(s)', t:normTxt(x.lib), n:x.n }));
 }
 function lev1(a, b){
   if(Math.abs(a.length - b.length) > 1) return false;
@@ -2651,7 +3218,7 @@ function analyser(q){
 const LIB_CHIP = {
   sem: v => 'Semaine ' + v, mois: v => MOIS[v - 1].replace(/^./, c => c.toUpperCase()), jour: () => 'Dernier jour',
   cop: v => COPER[v] || v, age30: () => '30 jours et +', ret: () => 'Déjà revenus', sst: () => 'Sous-traitance',
-  ens: v => v, atl: v => 'Atelier ' + v, mq: v => 'Marque ' + v, fam: v => 'Famille ' + v, ld: v => 'Magasin ' + String(v).replace(/^MAG\s+/, ''), texte: v => '« ' + v + ' »'
+  ens: v => v, atl: v => 'Atelier ' + v, mq: v => 'Marque ' + v, fam: v => 'Famille ' + v, ref: v => 'Pièce ' + v, ld: v => 'Magasin ' + String(v).replace(/^MAG\s+/, ''), texte: v => '« ' + v + ' »'
 };
 let SUG = [], SUG_I = -1;
 function suggerer(){
@@ -2680,6 +3247,8 @@ function suggerer(){
     grp('Marques', chercher(IDX.mq, toks, 3), 'mq', '🏷');
     grp('Familles', chercher(IDX.fam, toks, 3), 'fam', '🧩');
     grp('Statuts', chercher(IDX.st, toks, 3), 'st', '🔖');
+    grp('Magasins', chercher(IDX.ld || [], toks, 4), 'ld', '🏬');
+    grp('Pièces', chercher(IDX.ref || [], toks, 5), 'ref', '🔩');
     if(BASE.fichiers.some(f => f.gen)){ const i = SUG.length; SUG.push({ kind:'gen', k:reste.join(' ') || q });
       h += '<div class="sg-t">Autres fichiers</div><div class="sg" data-i="' + i + '" onclick="choisirSugg(' + i + ')"><div class="av">📄</div><div class="l"><b>Chercher « ' + echap(reste.join(' ') || q) + ' » dans les fichiers génériques</b></div></div>'; }
   }
@@ -2712,6 +3281,8 @@ function choisirSugg(i){
   if(s.kind === 'mq') CHIPS.mq = s.k;
   if(s.kind === 'fam') CHIPS.fam = s.k;
   if(s.kind === 'st'){ CHIPS.texte = s.k; }
+  if(s.kind === 'ld'){ memoriser(); CHIPS.ld = s.k; $('q').value = ''; $('qClr').style.display = 'none'; aller('mag', true); return; }
+  if(s.kind === 'ref'){ memoriser(); CHIPS.ref = s.k; $('q').value = ''; $('qClr').style.display = 'none'; aller('pieces', true); return; }
   $('q').value = ''; $('qClr').style.display = 'none';
   rendre();
 }
@@ -3060,6 +3631,7 @@ async function rendreSources(){
     '<div class="rangee" style="margin-top:10px"><label class="note">Heures par jour retenues quand PilotAtelier n\'est pas chargé : </label>' +
     '<input class="champ num" type="number" min="1" max="12" step="0.5" style="width:80px" value="' + (REG.heuresJour || 7) + '" onchange="REG.heuresJour=Math.max(1,+this.value||7);sauverReglages();rendre()"></div>' +
     '<div class="note" style="margin-top:8px">Types reconnus automatiquement : ' + Object.keys(TYPES).filter(t => t !== 'GEN').map(t => TYPES[t].icone + ' ' + TYPES[t].nom).join(' · ') + '. Tout autre tableau Excel est lu comme « fichier générique » et reste consultable par la recherche.</div></div>';
+  h += carteReglages();
   el.innerHTML = h;
   const ls = await listerSauvegardes();
   const box = $('listeSauv'); if(!box || !ls) return;
@@ -3078,7 +3650,9 @@ const ATTENDUS = [
   { t:'TERMJ1',  nom:'SUIVI_INTERS_NOMAD_Terminées_Multisite_J-1.xlsx', pour:'Pannes (symptômes, diagnostics, résolutions), comparaison des sites' },
   { t:'HD',      nom:'Encours hors délais.xlsm', pour:'Encours hors délais par acteur' },
   { t:'P30',     nom:'Plus de 30 Jours atl Bezons.xlsx', pour:'Encours de plus de 30 jours' },
-  { t:'PILOT',   nom:'efficience_CODE.json · PilotAtelier_Mobile.json', pour:'Heures réelles des techniciens (sinon 7 h/jour estimées)' }
+  { t:'HEURES',  nom:'Fichier des heures des intervenants (Excel)', pour:'Efficience réelle (code intervenant, date, heures ou début / fin)' },
+  { t:'PIECES',  nom:'Fichier des pièces consommées (Excel)', pour:'Hit-parade des pièces, coût, pièces sur appareils revenus' },
+  { t:'PILOT',   nom:'efficience_CODE.json · PilotAtelier_Mobile.json', pour:'Heures saisies dans PilotAtelier (sinon 7 h/jour estimées)' }
 ];
 function fichiersAttendus(){
   const lus = t => BASE.fichiers.filter(f => f.type === t);
